@@ -1,5 +1,5 @@
 import { NonceManager } from "@ethersproject/experimental";
-import { BigNumber, Wallet } from "ethers";
+import {BigNumber, BigNumberish, Wallet} from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
@@ -18,26 +18,33 @@ async function main() {
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    )
+    );
     const adminContract = await assetContract.connect(adminSigner);
     const proxyContract = await assetContract.connect(proxySigner);
     const creatorContract = await assetContract.connect(creatorSigner);
 
     const lastNftId = Number(process.env.FINPL_NFT_LAST_TOKEN_ID || "0");
-    const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
+    const batchCount = Number(process.env.FINPL_NFT_BATCH_COUNT || "1");
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes("");
 
+    let tokenIds: BigNumber[] = [];
+    let quantities: BigNumberish[] = [];
     let makerPart = BigNumber.from(ethers.utils.hexZeroPad(newCreator.address, 32));
     makerPart = makerPart.shl(96); // shift 12 bytees
-    let newIdPart = BigNumber.from(lastNftId + 1);
-    newIdPart = newIdPart.shl(40); // shift 5 bytes
-    let quantityPart = BigNumber.from(quantity);
-    const tokenId = makerPart.add(newIdPart).add(quantityPart);
-    console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
+    for (let i = 0; i < batchCount; i++) {
+        let newIdPart = BigNumber.from(lastNftId + 1 + i);
+        newIdPart = newIdPart.shl(40); // shift 5 bytes
+        const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
+        quantities.push(quantity);
+        let quantityPart = BigNumber.from(quantity);
+        const tokenId = makerPart.add(newIdPart).add(quantityPart);
+        console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
+        tokenIds.push(tokenId);
+    }
 
-    await adminContract.mint(newCreator.address, tokenId, quantity, buffer);
-    console.log("Token minted to:", newCreator.address);
+    await adminContract.batchMint(newCreator.address, tokenIds, quantities, buffer);
+    console.log("All tokens minted to:", newCreator.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
