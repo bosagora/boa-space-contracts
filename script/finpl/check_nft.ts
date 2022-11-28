@@ -12,7 +12,7 @@ async function main() {
     const provider = ethers.provider;
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
-    const curCreator = process.env.FINPL_NFT_NEW_CREATOR || "";
+    const curCreator = new Wallet(process.env.FINPL_NFT_NEW_CREATOR || "");
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
@@ -27,7 +27,7 @@ async function main() {
     console.log("uri:", await ownerAssetContract.uri(tokenId));
     console.log("creator:", await ownerAssetContract.creator(tokenId));
     console.log("balance of owner:", await ownerAssetContract.balanceOf(admin.address, tokenId));
-    console.log("balance of creator:", await ownerAssetContract.balanceOf(curCreator, tokenId));
+    console.log("balance of creator:", await ownerAssetContract.balanceOf(curCreator.address, tokenId));
 }
 
 // We recommend this pattern to be able to use async/await everywhere
