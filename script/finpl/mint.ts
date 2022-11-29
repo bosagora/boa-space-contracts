@@ -9,19 +9,14 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
     const provider = ethers.provider;
 
-    const admin = new Wallet(process.env.ADMIN_KEY || "");
-    const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
-    const newCreator = new Wallet(process.env.FINPL_NFT_NEW_CREATOR || "");
-    const creatorSigner = new NonceManager(new GasPriceManager(provider.getSigner(newCreator.address)));
+    const newCreator = new Wallet(process.env.FINPL_NFT_CREATOR || "");
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
     )
-    const adminContract = await assetContract.connect(adminSigner);
     const proxyContract = await assetContract.connect(proxySigner);
-    const creatorContract = await assetContract.connect(creatorSigner);
 
     const lastNftId = Number(process.env.FINPL_NFT_LAST_TOKEN_ID || "0");
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
@@ -36,7 +31,7 @@ async function main() {
     const tokenId = makerPart.add(newIdPart).add(quantityPart);
     console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
 
-    await adminContract.mint(newCreator.address, tokenId, quantity, buffer);
+    await proxyContract.mint(newCreator.address, tokenId, quantity, buffer);
     console.log("Token minted to:", newCreator.address);
 }
 

@@ -9,17 +9,14 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
     const provider = ethers.provider;
 
-    const admin = new Wallet(process.env.ADMIN_KEY || "");
-    const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
-    const newCreator = new Wallet(process.env.FINPL_NFT_NEW_CREATOR || "");
+    const newCreator = new Wallet(process.env.FINPL_NFT_CREATOR || "");
     const creatorSigner = new NonceManager(new GasPriceManager(provider.getSigner(newCreator.address)));
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
     );
-    const adminContract = await assetContract.connect(adminSigner);
     const proxyContract = await assetContract.connect(proxySigner);
     const creatorContract = await assetContract.connect(creatorSigner);
 
@@ -43,7 +40,7 @@ async function main() {
         tokenIds.push(tokenId);
     }
 
-    await adminContract.batchMint(newCreator.address, tokenIds, quantities, buffer);
+    await proxyContract.batchMint(newCreator.address, tokenIds, quantities, buffer);
     console.log("All tokens minted to:", newCreator.address);
 }
 
