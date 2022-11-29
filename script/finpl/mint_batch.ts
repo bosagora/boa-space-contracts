@@ -4,6 +4,7 @@ import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
+import {string} from "hardhat/internal/core/params/argumentTypes";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -11,14 +12,12 @@ async function main() {
 
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
-    const newCreator = new Wallet(process.env.FINPL_NFT_CREATOR || "");
-    const creatorSigner = new NonceManager(new GasPriceManager(provider.getSigner(newCreator.address)));
+    const creator = process.env.FINPL_NFT_CREATOR || "";
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
     );
     const proxyContract = await assetContract.connect(proxySigner);
-    const creatorContract = await assetContract.connect(creatorSigner);
 
     const lastNftId = Number(process.env.FINPL_NFT_LAST_TOKEN_ID || "0");
     const batchCount = Number(process.env.FINPL_NFT_BATCH_COUNT || "1");
@@ -27,8 +26,9 @@ async function main() {
 
     let tokenIds: BigNumber[] = [];
     let quantities: BigNumberish[] = [];
-    let makerPart = BigNumber.from(ethers.utils.hexZeroPad(newCreator.address, 32));
+    let makerPart = BigNumber.from(ethers.utils.hexZeroPad(creator, 32));
     makerPart = makerPart.shl(96); // shift 12 bytees
+    let tokenIdsStr: string = "";
     for (let i = 0; i < batchCount; i++) {
         let newIdPart = BigNumber.from(lastNftId + 1 + i);
         newIdPart = newIdPart.shl(40); // shift 5 bytes
@@ -36,12 +36,16 @@ async function main() {
         quantities.push(quantity);
         let quantityPart = BigNumber.from(quantity);
         const tokenId = makerPart.add(newIdPart).add(quantityPart);
-        console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
+        tokenIdsStr += tokenId.toHexString() + " , ";
         tokenIds.push(tokenId);
     }
+    console.log("====== Combine tokenIds(HEX) ======")
+    console.log(tokenIdsStr.slice(0, -3));
+    console.log("====== Combine tokenIds ======");
+    console.log(tokenIds);
 
-    await proxyContract.batchMint(newCreator.address, tokenIds, quantities, buffer);
-    console.log("All tokens minted to:", newCreator.address);
+    await proxyContract.batchMint(creator, tokenIds, quantities, buffer);
+    console.log("All tokens minted to:", creator);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

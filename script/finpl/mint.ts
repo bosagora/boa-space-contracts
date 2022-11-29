@@ -11,7 +11,7 @@ async function main() {
 
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
-    const newCreator = new Wallet(process.env.FINPL_NFT_CREATOR || "");
+    const creator = process.env.FINPL_NFT_CREATOR || "";
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
@@ -23,7 +23,7 @@ async function main() {
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes("");
 
-    let makerPart = BigNumber.from(ethers.utils.hexZeroPad(newCreator.address, 32));
+    let makerPart = BigNumber.from(ethers.utils.hexZeroPad(creator, 32));
     makerPart = makerPart.shl(96); // shift 12 bytees
     let newIdPart = BigNumber.from(lastNftId + 1);
     newIdPart = newIdPart.shl(40); // shift 5 bytes
@@ -31,8 +31,8 @@ async function main() {
     const tokenId = makerPart.add(newIdPart).add(quantityPart);
     console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
 
-    await proxyContract.mint(newCreator.address, tokenId, quantity, buffer);
-    console.log("Token minted to:", newCreator.address);
+    await proxyContract.mint(creator, tokenId, quantity, buffer);
+    console.log("Token minted to:", creator);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
