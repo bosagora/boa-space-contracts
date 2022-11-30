@@ -42,7 +42,9 @@ async function main() {
     console.log("====== Combine tokenIds(HEX) ======")
     console.log(tokenIdsStr.slice(0, -3));
     console.log("====== Combine tokenIds ======");
-    console.log(tokenIds);
+    for (let id of tokenIds) {
+        console.log(id.toString());
+    }
 
     await proxyContract.batchMint(creator, tokenIds, quantities, buffer);
     console.log("All tokens minted to:", creator);
