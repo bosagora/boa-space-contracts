@@ -5,7 +5,7 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
 
     const provider = ethers.provider;
-    const buyer = new Wallet(process.env.BUYER_KEY || "");
+    const buyer = process.env.FINPL_NFT_BUYER || "";
     const creator = process.env.FINPL_NFT_CREATOR || "";
 
     const assetContract = await AssetContractFactory.attach(
@@ -14,14 +14,14 @@ async function main() {
 
     const tokenIds = process.env.TRANSFER_COMBINE_TOKEN_IDS.split(",");
     console.log("Creator:", creator);
-    console.log("Buyer:", buyer.address);
+    console.log("Buyer:", buyer);
     console.log("TokenIds:", tokenIds);
     for (let id of tokenIds) {
         const tokenId = BigNumber.from(id.trim());
-        console.log("Balances of Token:", tokenId.toHexString());
+        console.log("Balances of Token: %s (%s)", tokenId.toString(), tokenId.toHexString());
         console.log("creator: %i, buyer: %i",
             Number(await assetContract.balanceOf(creator, tokenId)),
-            Number(await assetContract.balanceOf(buyer.address, tokenId)));
+            Number(await assetContract.balanceOf(buyer, tokenId)));
     }
 }
 

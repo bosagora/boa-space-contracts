@@ -8,8 +8,8 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
     const provider = ethers.provider;
 
-    const buyer = new Wallet(process.env.BUYER_KEY || "");
     const creator = process.env.FINPL_NFT_CREATOR || "";
+    const buyer = process.env.FINPL_NFT_BUYER || "";
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
     const assetContract = await AssetContractFactory.attach(
@@ -43,13 +43,13 @@ async function main() {
     const buffer = ethers.utils.toUtf8Bytes("");
     await proxyContract.safeBatchTransferFrom(
         creator,
-        buyer.address,
+        buyer,
         transferIds,
         transferAmounts,
         buffer);
 
     console.log(transferIds);
-    console.log("Tokens Transferred to", buyer.address);
+    console.log("Tokens Transferred to", buyer);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
