@@ -18,9 +18,11 @@ async function main() {
     console.log("TokenIds:", tokenIds);
     for (let id of tokenIds) {
         const tokenId = BigNumber.from(id.trim());
-        console.log("Balances of Token: %s (%s)", tokenId.toString(), tokenId.toHexString());
-        console.log("creator: %i, buyer: %i",
+        console.log("# Balances of Token: %s (%s)", tokenId.toString(), tokenId.toHexString());
+        console.log("\tcreator(%s): %i, buyer(%s): %i",
+            creator,
             Number(await assetContract.balanceOf(creator, tokenId)),
+            buyer,
             Number(await assetContract.balanceOf(buyer, tokenId)));
     }
 }
