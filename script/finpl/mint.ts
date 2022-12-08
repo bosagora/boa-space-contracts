@@ -2,6 +2,7 @@ import { NonceManager } from "@ethersproject/experimental";
 import { BigNumber, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
+import { getTokenIdInfo } from "../../utils/ParseTokenID";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
 
@@ -18,14 +19,15 @@ async function main() {
     )
     const proxyContract = await assetContract.connect(proxySigner);
 
-    const lastNftId = Number(process.env.FINPL_NFT_LAST_TOKEN_ID || "0");
+    const lastNftId = process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "0";
+    const [address, tokenIndex, maxSupply] = getTokenIdInfo(lastNftId);
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes("");
 
     let makerPart = BigNumber.from(ethers.utils.hexZeroPad(creator, 32));
     makerPart = makerPart.shl(96); // shift 12 bytees
-    let newIdPart = BigNumber.from(lastNftId + 1);
+    let newIdPart = BigNumber.from(tokenIndex + 1);
     newIdPart = newIdPart.shl(40); // shift 5 bytes
     let quantityPart = BigNumber.from(quantity);
     const tokenId = makerPart.add(newIdPart).add(quantityPart);
