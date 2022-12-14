@@ -22,10 +22,10 @@ async function main() {
 
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
-    const seller = new Wallet(process.env.ORDER_SELLER_KEY || "");
-    const sellerSigner = new NonceManager(new GasPriceManager(provider.getSigner(seller.address)));
-    const buyer = new Wallet(process.env.ORDER_BUYER_KEY || "");
-    const buyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(buyer.address)));
+    const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
+    const offererSigner = new NonceManager(new GasPriceManager(provider.getSigner(offerer.address)));
+    const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
+    const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
     const conduitAddress = process.env.CONDUIT_ADDRESS;
     const marketplace = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
     const storefront = await StorefrontFactory.attach(process.env.LAZY_MINT_ADAPTER_ADDRESS || "");
@@ -38,51 +38,51 @@ async function main() {
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).setApprovalForAll(marketplace.address, true);
-    await assetToken.connect(adminSigner).addSharedProxyAddress(marketplace.address);
+    // await assetToken.connect(adminSigner).addSharedProxyAddress(marketplace.address);
 
     // The needed amount of WBOA for trading
     const sellerAmount = ethers.utils.parseEther("0.1");
     const reserveAmount = ethers.utils.parseEther("0.1");
 
     // approve WBOAs of seller to the Seaport
-    await wboaToken.connect(sellerSigner).approve(marketplace.address, sellerAmount);
+    await wboaToken.connect(offererSigner).approve(marketplace.address, sellerAmount);
 
     // update channel for seller and buyer
-    let status = await conduitController.getChannelStatus(conduitAddress, seller.address);
+    let status = await conduitController.getChannelStatus(conduitAddress, offerer.address);
     if (!status) {
-        await conduitController.updateChannel(conduitAddress, seller.address, true);
+        await conduitController.updateChannel(conduitAddress, offerer.address, true);
     }
-    status = await conduitController.getChannelStatus(conduitAddress, buyer.address);
+    status = await conduitController.getChannelStatus(conduitAddress, fulfiller.address);
     if (!status) {
-        await conduitController.updateChannel(conduitAddress, buyer.address, true);
+        await conduitController.updateChannel(conduitAddress, fulfiller.address, true);
     }
 
     // Current status of seller, buyer, and nft
-    let amount = await provider.getBalance(seller.address);
-    console.log("seller(%s) balance:", seller.address, amount.toString());
-    amount = await provider.getBalance(buyer.address);
-    console.log("buyer(%s) balance:", buyer.address, amount.toString());
+    let amount = await provider.getBalance(offerer.address);
+    console.log("offerer(%s) balance:", offerer.address, amount.toString());
+    amount = await provider.getBalance(fulfiller.address);
+    console.log("fulfiller(%s) balance:", fulfiller.address, amount.toString());
     console.log("====== Minted NFT information ======");
     console.log("tokenId:", tokenId.toHexString());
     console.log("creator:", await assetToken.creator(tokenId));
-    console.log("balance of buyer:", await assetToken.balanceOf(buyer.address, tokenId));
+    console.log("balance of buyer:", await assetToken.balanceOf(fulfiller.address, tokenId));
 
     // deposit BOA to WBOA contract from seller
-    amount = await wboaToken.getBalance(seller.address);
+    amount = await wboaToken.getBalance(offerer.address);
     if (amount <= sellerAmount.add(reserveAmount)) {
-        await wboaToken.connect(sellerSigner).deposit(
+        await wboaToken.connect(offererSigner).deposit(
             {value: sellerAmount.add(reserveAmount)}
         );
     }
-    amount = await wboaToken.getBalance(buyer.address);
+    amount = await wboaToken.getBalance(fulfiller.address);
     if (amount <= reserveAmount) {
-        await wboaToken.connect(buyerSigner).deposit(
+        await wboaToken.connect(fulfillerSigner).deposit(
             {value: reserveAmount}
         );
     }
-    amount = await wboaToken.getBalance(seller.address);
+    amount = await wboaToken.getBalance(offerer.address);
     console.log("seller's WBOA:", amount.toString());
-    amount = await wboaToken.getBalance(buyer.address);
+    amount = await wboaToken.getBalance(fulfiller.address);
     console.log("buyer's WBOA:", amount.toString());
 
     // TODO: Make utility functions creating offer and consideration
@@ -117,12 +117,12 @@ async function main() {
             identifierOrCriteria: toBN(identifierOrCriteria),
             startAmount: toBN(startAmount),
             endAmount: toBN(endAmount),
-            recipient: seller.address
+            recipient: offerer.address
         },
     ];
 
     const {order, orderHash, value} = await createOrder(
-        seller,
+        offerer,
         ZeroAddress,
         offer,
         consideration,
@@ -136,7 +136,7 @@ async function main() {
     console.log("value:", value);
 
     const tx = marketplace
-        .connect(buyerSigner)
+        .connect(fulfillerSigner)
         .fulfillOrder(order, toKey(0), {
             value,
         });

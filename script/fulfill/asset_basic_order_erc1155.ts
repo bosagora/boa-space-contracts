@@ -17,12 +17,12 @@ async function main() {
   const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
   const provider = ethers.provider;
 
-  const seller = new Wallet(process.env.ORDER_SELLER_KEY || "");
+  const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
   const owner = new Wallet(process.env.OWNER_KEY || "");
   const admin = new Wallet(process.env.ADMIN_KEY || "");
   const zone = new Wallet(process.env.ZONE_KEY || "");
-  const buyer = new Wallet(process.env.ORDER_BUYER_KEY || "");
-  const buyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(buyer.address)));
+  const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
+  const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
   const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
   const marketplaceContract = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
   const sharedAsset = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
@@ -31,7 +31,7 @@ async function main() {
 
   // approve to the marketplace
   await sharedAsset.connect(adminSigner).setApprovalForAll(marketplaceContract.address, true);
-  await sharedAsset.connect(adminSigner).addSharedProxyAddress(marketplaceContract.address);
+  // await sharedAsset.connect(adminSigner).addSharedProxyAddress(marketplaceContract.address);
   console.log("SetApprovalForAll called");
 
   const itemType: number = 3;
@@ -50,11 +50,11 @@ async function main() {
   ];
 
   const consideration = [
-    getItemETH(parseEther("0.1"), parseEther("0.1"), seller.address),
+    getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address),
   ];
 
   const { order, orderHash, value } = await createOrder(
-    seller,
+    offerer,
     ZeroAddress,
     offer,
     consideration,
@@ -68,7 +68,7 @@ async function main() {
   console.log("value:", value);
 
   const tx = marketplaceContract
-    .connect(buyerSigner)
+    .connect(fulfillerSigner)
     .fulfillOrder(order, toKey(0), {
       value,
     });

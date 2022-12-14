@@ -21,26 +21,30 @@ async function main() {
   const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
   const WBOAFactory = await ethers.getContractFactory("WBOA9");
 
-  const seller = new Wallet(process.env.ORDER_SELLER_KEY || "");
-  const buyer = new Wallet(process.env.ORDER_BUYER_KEY || "");
+  const creator = process.env.FINPL_NFT_CREATOR || "";
+  const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
+  const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
   const assetToken = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
   const wboaToken = await WBOAFactory.attach(process.env.WBOA_ADDRESS);
   const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
 
-  console.log("====== Seller balance\t:", seller.address);
+  console.log("====== Asset Token");
+  console.log("address:", assetToken.address);
+  console.log("creator:", creator);
+  console.log("====== Offerer");
+  console.log("address:", offerer.address);
   console.log("BOA\t:",
-      (await provider.getBalance(seller.address)).toString());
+      (await provider.getBalance(offerer.address)).toString());
   console.log("WBOA\t:",
-      (await wboaToken.getBalance(seller.address)).toString());
-  console.log("NFT(%s)\t: %i",
-      assetToken.address, (await assetToken.balanceOf(seller.address, tokenId)).toString());
-  console.log("====== Buyer balance\t:", buyer.address);
+      (await wboaToken.getBalance(offerer.address)).toString());
+  console.log("Asset amount\t:", (await assetToken.balanceOf(offerer.address, tokenId)).toString());
+  console.log("====== Fulfiller");
+  console.log("address:", fulfiller.address);
   console.log("BOA\t:",
-      (await provider.getBalance(buyer.address)).toString());
+      (await provider.getBalance(fulfiller.address)).toString());
   console.log("WBOA\t:",
-      (await wboaToken.getBalance(buyer.address)).toString());
-  console.log("NFT(%s)\t: %i",
-      assetToken.address, (await assetToken.balanceOf(buyer.address, tokenId)).toString());
+      (await wboaToken.getBalance(fulfiller.address)).toString());
+  console.log("Asset amount\t:", (await assetToken.balanceOf(fulfiller.address, tokenId)).toString());
 }
 
 // We recommend this pattern to be able to use async/await everywhere

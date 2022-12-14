@@ -18,11 +18,11 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
     const provider = ethers.provider;
 
-    const seller = new Wallet(process.env.ORDER_SELLER_KEY || "");
+    const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
-    const buyer = new Wallet(process.env.ORDER_BUYER_KEY || "");
-    const buyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(buyer.address)));
+    const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
+    const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
     const marketplace = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
     const storefront = await StorefrontFactory.attach(process.env.LAZY_MINT_ADAPTER_ADDRESS || "");
     const assetToken = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS);
@@ -32,7 +32,7 @@ async function main() {
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).setApprovalForAll(marketplace.address, true);
-    await assetToken.connect(adminSigner).addSharedProxyAddress(marketplace.address);
+    // await assetToken.connect(adminSigner).addSharedProxyAddress(marketplace.address);
 
     // TODO: Make utility functions creating offer and consideration
 
@@ -52,11 +52,11 @@ async function main() {
     ];
 
     const consideration = [
-        getItemETH(parseEther("0.1"), parseEther("0.1"), seller.address),
+        getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address),
     ];
 
     const { order, orderHash, value } = await createOrder(
-        seller,
+        offerer,
         ZeroAddress,
         offer,
         consideration,
@@ -70,7 +70,7 @@ async function main() {
     console.log("value:", value);
 
     const tx = marketplace
-        .connect(buyerSigner)
+        .connect(fulfillerSigner)
         .fulfillOrder(order, toKey(0), {
             value,
         });

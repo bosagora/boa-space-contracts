@@ -9,31 +9,36 @@ We describe how to use scripts to fulfill an order and check it for the three wa
 This description is the steps for trading NFTs in [TestNet](https://testnet.boascan.io).
 
 ## Prerequisites
-You should set the keys of the seller(=offerer) and the buyer(=fulfiller) in the `.env` file. You should copy the `.env.sample` to `.env` file if there is no `.env` file in your local environment.
+You should set the keys of the offerer and the fulfiller in the `.env` file. You should copy the `.env.sample` to `.env` file if there is no `.env` file in your local environment.
 
 ```typescript
 # Fulfilling an Order
-ORDER_SELLER_KEY=0x158ad623fa14d8ca6bce416b877905b2d11d3842ddd4adbb71332e809263abb5
-ORDER_BUYER_KEY=0xbacfa3fbe768c1665feee09af7182ae53ca9a334db747b3751149f81e448ac26
+ORDER_OFFERER_KEY=0x158ad623fa14d8ca6bce416b877905b2d11d3842ddd4adbb71332e809263abb5
+ORDER_FULFILLER_KEY=0xbacfa3fbe768c1665feee09af7182ae53ca9a334db747b3751149f81e448ac26
 ```
 
-- `ORDER_SELLER_KEY` is for the key of the seller(=offerer) who creates an order having an offer of BOAs, WBOAs, or ERC1155 compatible tokens with considerations that could have same kind of tokens as offer.
-- `ORDER_BUYER_KEY` is for the key of the buyer(=fulfiller) who fulfill an order, which means that the fulfiller gives the consideration in response to getting the offer. 
+- `ORDER_OFFERER_KEY` is for the key of the offerer who creates an order having an offer of BOAs, WBOAs, or ERC1155 compatible tokens with considerations that could have same kind of tokens as offer.
+- `ORDER_FULFILLER_KEY` is for the key of the fulfiller who fulfill an order, which means that the fulfiller gives the consideration in response to getting the offer. 
 
-You should check the balances of the seller and buyer with the following command.
+You should check the balances of the offerer and fulfiller with the following command.
 ```typescript
 npx hardhat run script/fulfill/check_fulfill.ts --network testnet
 ```
-And you can get the following information about balances of BOA, WBOA, and NFTs for the seller and buyer from the network.
+And you can get the following information about balances of BOA, WBOA, and NFTs for the offerer and fulfiller from the network.
 ```
-====== Seller balance   : 0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53
-BOA     : 21991018220158085028
-WBOA    : 3000000000000000000
-NFT(0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd) : 33
-====== Buyer balance    : 0xAcb913db781a46611fAa04Ff6Cb9A370df069eed
-BOA     : 9960988147586444737674
-WBOA    : 31000000000000000000
-NFT(0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd) : 17
+====== Asset Token
+address: 0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd
+creator: 0xAcb913db781a46611fAa04Ff6Cb9A370df069eed
+====== Offerer
+address: 0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53
+BOA     : 999888197909644923579
+WBOA    : 1900000000000000000
+Asset amount    : 1
+====== Fulfiller
+address: 0xAcb913db781a46611fAa04Ff6Cb9A370df069eed
+BOA     : 8966085233549931187837
+WBOA    : 35100000000000000000
+Asset amount    : 99
 ```
 
 We summarize the addresses for the contracts that are used frequently in this document.
@@ -47,7 +52,7 @@ We summarize the addresses for the contracts that are used frequently in this do
 ### 1.1. Offer NFT and receive BOA as consideration
 This describes the steps for fulfilling an order that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through `Seaport` and `SharedStorefrontLazyMintAdapter` contracts.
 
-You should check the balances of the seller and buyer with this command before fulfilling an order.
+You should check the balances of the offerer and fulfiller with this command before fulfilling an order.
 ```
 npx hardhat run script/fulfill/check_fulfill.ts --network testnet
 ```
@@ -104,15 +109,15 @@ consideration: [
 
 ```
 
-You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had check the balances of the seller and buyer before fulfilling the order.
+You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had check the balances of the offerer and buyer before fulfilling the order.
 ```typescript
-npx hardhat run script/fulfill/asset_basic_order.ts --network testnet 
+npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
 ```
 
 ### 1.2. Offer WBOA and receive NFT as consideration
 This describes the fulfilling an order that consists of an offer having an 0.1 `WBOA` and a consideration having a `NFT` token.
 
-You should check the balances of the seller and buyer with this command.
+You should check the balances of the offerer and fulfiller with this command.
 ```
 npx hardhat run script/fulfill/check_fulfill.ts --network testnet
 ```
@@ -168,9 +173,9 @@ consideration: [
 ]
 ```
 
-You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had check the balances of the seller and buyer before fulfilling the order.
+You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had check the balances of the offerer and fulfiller before fulfilling the order.
 ```typescript
-npx hardhat run script/fulfill/asset_basic_order.ts --network testnet 
+npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
 ```
 
 ## 2. Fulfill through the `Seaport` and `Conduit`
@@ -180,7 +185,7 @@ npx hardhat run script/fulfill/asset_basic_order.ts --network testnet
 ## 3. Fulfill through the `Seaport`
 This describes the steps for fulfilling an order that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through the `Seaport` contract without `SharedStorefrontLazyMintAdapter` or `Conduit` contracts.
 ```
-npx hardhat run script/fulfill/asset_basic_order.ts --network testnet 
+npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
 ```
 The order will have the similar components as follows.
 ```typescript
@@ -230,7 +235,7 @@ consideration: [
 
 ```
 
-You should check the result with the `check_fulfills.ts` script as you had check the status of the seller and buyer before fulfilling the order.
+You should check the result with the `check_fulfills.ts` script as you had check the status of the offerer and fulfiller before fulfilling the order.
 ```typescript
-npx hardhat run script/fulfill/asset_basic_order.ts --network testnet 
+npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
 ```
