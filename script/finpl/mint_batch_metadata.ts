@@ -5,7 +5,7 @@ import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
 import {string} from "hardhat/internal/core/params/argumentTypes";
-import {getTokenIdInfo} from "../../utils/ParseTokenID";
+import {parseTokenId} from "../../utils/ParseTokenID";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -20,7 +20,7 @@ async function main() {
     const creatorContract = await assetContract.connect(creatorSigner);
 
     const lastNftId = process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "0";
-    const [address, tokenIndex, maxSupply] = getTokenIdInfo(lastNftId);
+    const [address, tokenIndex, maxSupply] = parseTokenId(lastNftId);
     const batchCount = Number(process.env.FINPL_NFT_BATCH_COUNT || "1");
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes(data);

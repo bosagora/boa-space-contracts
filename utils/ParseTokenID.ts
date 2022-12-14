@@ -1,6 +1,9 @@
 import { BigNumber, BigNumberish, Wallet} from "ethers";
+import {ethers} from "hardhat";
+import {NonceManager} from "@ethersproject/experimental";
+import {GasPriceManager} from "./GasPriceManager";
 
-export function getTokenIdInfo(tokenId: string): [string, number, number] {
+export function parseTokenId(tokenId: string): [string, number, number] {
     const ADDRESS_BITS = 160;
     const INDEX_BITS = 56;
     const SUPPLY_BITS = 40;
@@ -14,4 +17,16 @@ export function getTokenIdInfo(tokenId: string): [string, number, number] {
     const maxSupply = lastNftId.and(SUPPLY_MASK).toNumber();
 
     return [address, tokenIndex, maxSupply];
+}
+
+export function createTokenId(address: string, index: number, maxSupply: number)
+: BigNumber {
+    let makerPart = BigNumber.from(ethers.utils.hexZeroPad(address, 32));
+    makerPart = makerPart.shl(96); // shift 12 bytees
+    let newIdPart = BigNumber.from(index);
+    newIdPart = newIdPart.shl(40); // shift 5 bytes
+    let quantityPart = BigNumber.from(maxSupply);
+    const tokenId = makerPart.add(newIdPart).add(quantityPart);
+
+    return tokenId;
 }

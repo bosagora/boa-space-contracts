@@ -3,7 +3,7 @@ import { create } from "domain";
 import {BigNumber, Wallet} from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../utils/GasPriceManager";
-import { getTokenIdInfo} from "../utils/ParseTokenID";
+import { parseTokenId} from "../utils/ParseTokenID";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -19,7 +19,7 @@ async function main() {
     const ownerAssetContract = await assetContract.connect(adminSigner);
 
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
-    const [address, tokenIndex, maxSupply] = getTokenIdInfo(tokenId);
+    const [address, tokenIndex, maxSupply] = parseTokenId(tokenId);
 
     console.log("====== Minted NFT information ======");
     console.log("tokenId:", tokenId);

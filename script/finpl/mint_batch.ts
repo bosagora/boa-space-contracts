@@ -2,7 +2,7 @@ import { NonceManager } from "@ethersproject/experimental";
 import {BigNumber, BigNumberish, Wallet} from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
-import { getTokenIdInfo } from "../../utils/ParseTokenID";
+import { parseTokenId } from "../../utils/ParseTokenID";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
 import {string} from "hardhat/internal/core/params/argumentTypes";
@@ -21,7 +21,7 @@ async function main() {
     const proxyContract = await assetContract.connect(proxySigner);
 
     const lastNftId = process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "0";
-    const [address, tokenIndex, maxSupply] = getTokenIdInfo(lastNftId);
+    const [address, tokenIndex, maxSupply] = parseTokenId(lastNftId);
     const batchCount = Number(process.env.FINPL_NFT_BATCH_COUNT || "1");
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes("");
