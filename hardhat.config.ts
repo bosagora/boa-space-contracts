@@ -93,6 +93,16 @@ const config: HardhatUserConfig = {
           },
         },
       },
+      "contracts/wboa/WBOA9.sol": {
+        version: "0.4.18",
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 1000000,
+          },
+        },
+      },
     },
   },
   networks: {
@@ -108,6 +118,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
+        process.env.ORDER_SELLER_KEY ?? "",
+        process.env.ORDER_BUYER_KEY ?? "",
       ],
     },
     testnet: {
@@ -119,6 +131,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
+        process.env.ORDER_SELLER_KEY ?? "",
+        process.env.ORDER_BUYER_KEY ?? "",
       ],
     },
     goerli: {
@@ -130,6 +144,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
+        process.env.ORDER_SELLER_KEY ?? "",
+        process.env.ORDER_BUYER_KEY ?? "",
       ],
     },
     localnet: {
@@ -141,6 +157,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
+        process.env.ORDER_SELLER_KEY ?? "",
+        process.env.ORDER_BUYER_KEY ?? "",
       ],
     },
   },
