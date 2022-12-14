@@ -2,9 +2,8 @@ import { NonceManager } from "@ethersproject/experimental";
 import { create } from "domain";
 import {BigNumber, Wallet} from "ethers";
 import { ethers } from "hardhat";
-import { GasPriceManager } from "../../utils/GasPriceManager";
-import { ConduitControllerInterface } from "../../typechain-types";
-import {expect} from "chai";
+import { GasPriceManager } from "../utils/GasPriceManager";
+import { getTokenIdInfo} from "../utils/ParseTokenID";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -17,16 +16,20 @@ async function main() {
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
     );
+    const ownerAssetContract = await assetContract.connect(adminSigner);
 
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
-    const ownerAssetContract = await assetContract.connect(adminSigner);
+    const [address, tokenIndex, maxSupply] = getTokenIdInfo(tokenId);
 
     console.log("====== Minted NFT information ======");
     console.log("tokenId:", tokenId);
     console.log("tokenId(HEX):", tokenId.toHexString());
     console.log("uri:", await ownerAssetContract.uri(tokenId));
     console.log("creator:", await ownerAssetContract.creator(tokenId));
-    console.log("balance of creator:", await ownerAssetContract.balanceOf(creator, tokenId));
+    console.log("token index:", tokenIndex);
+    console.log("max supply:", maxSupply);
+    console.log("balance of creator:",
+        (await ownerAssetContract.balanceOf(creator, tokenId)).toString());
 }
 
 // We recommend this pattern to be able to use async/await everywhere
