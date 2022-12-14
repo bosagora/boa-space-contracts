@@ -4,7 +4,8 @@ import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
-import {parseTokenId} from "../../utils/ParseTokenID";
+import {createTokenId, parseTokenId} from "../../utils/ParseTokenID";
+import {token} from "../../typechain-types/@openzeppelin/contracts";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -18,18 +19,12 @@ async function main() {
     )
     const creatorContract = await assetContract.connect(creatorSigner);
 
-    const lastNftId = process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "0";
-    const [address, tokenIndex, maxSupply] = parseTokenId(lastNftId);
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
+    const tokenIndex = Number(process.env.FINPL_NFT_INDEX || "0");
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes(data);
 
-    let makerPart = BigNumber.from(ethers.utils.hexZeroPad(creator.address, 32));
-    makerPart = makerPart.shl(96); // shift 12 bytees
-    let newIdPart = BigNumber.from(tokenIndex + 1);
-    newIdPart = newIdPart.shl(40); // shift 5 bytes
-    let quantityPart = BigNumber.from(quantity);
-    const tokenId = makerPart.add(newIdPart).add(quantityPart);
+    const tokenId = createTokenId(creator.address, tokenIndex + 1, quantity);
     console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
 
     await creatorContract.mint(creator.address, tokenId, quantity, buffer);
