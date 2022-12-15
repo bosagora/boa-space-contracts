@@ -248,8 +248,8 @@ consideration: [
 ```
 
 You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had checked the balances of the offerer and buyer before fulfilling the order.
-```typescript
-npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
+```
+npx hardhat run script/fulfill/check_fulfill.ts --network testnet
 ```
 
 ### Offer WBOA and receive NFT as consideration
@@ -312,8 +312,8 @@ consideration: [
 ```
 
 You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had check the balances of the offerer and fulfiller before fulfilling the order.
-```typescript
-npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
+```
+npx hardhat run script/fulfill/check_fulfill.ts --network testnet 
 ```
 
 ## Fulfill through the `Seaport` and `Conduit`
@@ -374,6 +374,6 @@ consideration: [
 ```
 
 You should check the result with the `check_fulfills.ts` script as you had checked the status of the offerer and fulfiller before fulfilling the order.
-```typescript
-npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
+```
+npx hardhat run script/fulfill/check_fulfill.ts --network testnet
 ```
