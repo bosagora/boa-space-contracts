@@ -21,7 +21,7 @@ async function main() {
   const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
   const WBOAFactory = await ethers.getContractFactory("WBOA9");
 
-  const creator = process.env.FINPL_NFT_CREATOR || "";
+  const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
   const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
   const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
   const assetToken = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
@@ -30,7 +30,7 @@ async function main() {
 
   console.log("====== Asset Token");
   console.log("address:", assetToken.address);
-  console.log("creator:", creator);
+  console.log("creator:", creator.address);
   console.log("====== Offerer");
   console.log("address:", offerer.address);
   console.log("BOA\t:",

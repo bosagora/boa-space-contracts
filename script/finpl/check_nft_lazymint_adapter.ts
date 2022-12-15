@@ -7,7 +7,7 @@ import { GasPriceManager } from "../../utils/GasPriceManager";
 async function main() {
     const LazyMintAdapterFactory = await ethers.getContractFactory("SharedStorefrontLazyMintAdapter");
 
-    const creator = process.env.FINPL_NFT_CREATOR || "";
+    const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
     const lazymintAdapter = await LazyMintAdapterFactory.attach(
         process.env.LAZY_MINT_ADAPTER_ADDRESS || ""
     );
@@ -16,8 +16,8 @@ async function main() {
     console.log("====== Minted NFT information ======");
     console.log("tokenId:", tokenId);
     console.log("tokenId(HEX):", tokenId.toHexString());
-    console.log("creator:", creator);
-    console.log("balance of creator:", await lazymintAdapter.balanceOf(creator, tokenId));
+    console.log("creator:", creator.address);
+    console.log("balance of creator:", await lazymintAdapter.balanceOf(creator.address, tokenId));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

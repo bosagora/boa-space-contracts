@@ -6,22 +6,22 @@ async function main() {
 
     const provider = ethers.provider;
     const buyer = process.env.FINPL_NFT_BUYER || "";
-    const creator = process.env.FINPL_NFT_CREATOR || "";
+    const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
 
     const assetContract = await AssetContractFactory.attach(
         process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
     );
 
     const tokenIds = process.env.TRANSFER_COMBINE_TOKEN_IDS.split(",");
-    console.log("Creator:", creator);
+    console.log("Creator:", creator.address);
     console.log("Buyer:", buyer);
     console.log("TokenIds:", tokenIds);
     for (let id of tokenIds) {
         const tokenId = BigNumber.from(id.trim());
         console.log("# Balances of Token: %s (%s)", tokenId.toString(), tokenId.toHexString());
         console.log("\tcreator(%s): %i, buyer(%s): %i",
-            creator,
-            Number(await assetContract.balanceOf(creator, tokenId)),
+            creator.address,
+            Number(await assetContract.balanceOf(creator.address, tokenId)),
             buyer,
             Number(await assetContract.balanceOf(buyer, tokenId)));
     }

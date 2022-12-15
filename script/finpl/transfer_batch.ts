@@ -8,7 +8,7 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
     const provider = ethers.provider;
 
-    const creator = process.env.FINPL_NFT_CREATOR || "";
+    const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
     const buyer = process.env.FINPL_NFT_BUYER || "";
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
@@ -42,7 +42,7 @@ async function main() {
 
     const buffer = ethers.utils.toUtf8Bytes("");
     await proxyContract.safeBatchTransferFrom(
-        creator,
+        creator.address,
         buyer,
         transferIds,
         transferAmounts,
