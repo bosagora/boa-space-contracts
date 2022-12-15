@@ -20,11 +20,11 @@ async function main() {
     const creatorContract = await assetContract.connect(creatorSigner);
 
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
-    const tokenIndex = Number(process.env.FINPL_NFT_INDEX || "0");
+    const tokenIndex = BigNumber.from(process.env.FINPL_NFT_INDEX || "0");
     const data = process.env.FINPL_NFT_DATA || "";
     const buffer = ethers.utils.toUtf8Bytes(data);
 
-    const tokenId = createTokenId(creator.address, tokenIndex + 1, quantity);
+    const tokenId = createTokenId(creator.address, tokenIndex, quantity);
     console.log("Combined tokenId:", tokenId.toString(), "(", tokenId.toHexString(), ")");
 
     await creatorContract.mint(creator.address, tokenId, quantity, buffer);
