@@ -88,6 +88,15 @@ You should set the deployed address of the `AssetContractShared` contract into t
 ASSET_CONTRACT_SHARED_ADDRESS=0x5d41eb6b532660932627E3A9BaE5B94B797F18b5
 ```
 
+You can check the information of the deployed contract as follows.
+```
+====== AssetContractShared information ======
+address: 0x5d41eb6b532660932627E3A9BaE5B94B797F18b5
+name: BoaSpace Collections
+symbol: BOASTORE
+templateURI: 
+```
+
 # Minting an AssetContractShared NFT
 ## Set information and mint an NFT token
 You should mint an NFT token before trading. This is a description of how to mint an NFT token. You could mint FINPL tokens also with these commands.
