@@ -70,8 +70,8 @@ LAZY_MINT_ADAPTER_ADDRESS=0xE11FDE48B267C0d4c56e38E7c7868aE5aE2C59Dd
 Set the `name`, `symbol`, `templateURI` in the `.env` file which are the properties of the contract. The value of `templateURI` is optional.
 ```
 # Parameters of AssetContractShared constructor
-ASSET_CONTRACT_NAME="BoaSpace Collections"
-ASSET_CONTRACT_SYMBOL=BOASTORE
+ASSET_CONTRACT_NAME="BOASPACE Collections"
+ASSET_CONTRACT_SYMBOL=BOASPACESTORE
 ASSET_CONTRACT_TEMPLATE_URI=
 ```
 Run this script for deploying the contract.
