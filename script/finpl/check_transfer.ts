@@ -5,7 +5,7 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
 
     const provider = ethers.provider;
-    const buyer = process.env.FINPL_NFT_BUYER || "";
+    const buyer = process.env.TRANSFER_BUYER || "";
     const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
 
     const assetContract = await AssetContractFactory.attach(
