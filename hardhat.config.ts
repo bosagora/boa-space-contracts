@@ -37,10 +37,8 @@ function getAccounts() {
     });
   }
   accounts[0].privateKey = process.env.ADMIN_KEY ?? "";
-  accounts[1].privateKey = process.env.USER_KEY ?? "";
-  accounts[2].privateKey = process.env.OWNER_KEY ?? "";
-  accounts[3].privateKey = process.env.ZONE_KEY ?? "";
-  accounts[4].privateKey = process.env.BUYER_KEY ?? "";
+  accounts[1].privateKey = process.env.ORDER_OFFERER_KEY ?? "";
+  accounts[2].privateKey = process.env.ORDER_FULFILLER_KEY ?? "";
 
   return accounts;
 }

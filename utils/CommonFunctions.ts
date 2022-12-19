@@ -31,6 +31,17 @@ export const setContracts = (seaportContrct: Seaport, erc1155Contract: BoaTestER
   testERC1155 = erc1155Contract;
 }
 
+export const setSeaport = (seaportContrct: Seaport) => {
+  marketplaceContract = seaportContrct;
+}
+
+// Default chainId is for the Bosagora testnet
+let chainId: number = 2019;
+
+export const setChainId = async (_chainId: number) => {
+  chainId = _chainId;
+}
+
 export const withBalanceChecks = async (
   ordersArray: AdvancedOrder[], // TODO: include order statuses to account for partial fills
   additionalPayouts: 0 | BigNumber,
@@ -702,8 +713,6 @@ const getAndVerifyOrderHash = async (orderComponents: OrderComponents) => {
   expect(orderHash).to.equal(derivedOrderHash);
   return orderHash;
 };
-
-const chainId: number = 2019;
 
 // Returns signature
 const signOrder = async (
