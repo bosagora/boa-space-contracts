@@ -118,6 +118,7 @@ const config: HardhatUserConfig = {
         process.env.BUYER_KEY ?? "",
         process.env.ORDER_OFFERER_KEY ?? "",
         process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
     testnet: {
@@ -131,6 +132,7 @@ const config: HardhatUserConfig = {
         process.env.BUYER_KEY ?? "",
         process.env.ORDER_OFFERER_KEY ?? "",
         process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
     goerli: {
@@ -144,6 +146,7 @@ const config: HardhatUserConfig = {
         process.env.BUYER_KEY ?? "",
         process.env.ORDER_OFFERER_KEY ?? "",
         process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
     localnet: {
@@ -157,6 +160,7 @@ const config: HardhatUserConfig = {
         process.env.BUYER_KEY ?? "",
         process.env.ORDER_OFFERER_KEY ?? "",
         process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
   },
