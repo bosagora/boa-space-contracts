@@ -87,7 +87,8 @@
     "test:forge": "FOUNDRY_PROFILE=reference forge build; FOUNDRY_PROFILE=optimized forge build; FOUNDRY_PROFILE=test forge test -vvv",
     "test:forge:lite": "FOUNDRY_PROFILE=reference forge build; FOUNDRY_PROFILE=lite forge test -vvv",
     "prepare": "husky install",
-    "prettier:ts": "node_modules/.bin/prettier --write --config .prettierrc 'test/**/*.ts' 'utils/**/*.ts' 'script/**/*.ts'"
+    "prettier:ts": "node_modules/.bin/prettier --write --config .prettierrc 'test/**/*.ts' 'utils/**/*.ts' 'script/**/*.ts'",
+    "prettier:ts:boa": "node_modules/.bin/prettier --write --config .prettierrc 'script/**/*.ts' 'test/boaspace.basicfulfill.ts'"
   },
   "lint-staged": {
     "*.sol": "prettier --write",
