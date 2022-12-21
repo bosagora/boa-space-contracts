@@ -1,5 +1,5 @@
 import { NonceManager } from "@ethersproject/experimental";
-import { BigNumber, Wallet} from "ethers";
+import { BigNumber, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
@@ -11,9 +11,7 @@ async function main() {
     const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
-    const assetContract = await AssetContractFactory.attach(
-        process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    );
+    const assetContract = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
     const proxyContract = await assetContract.connect(proxySigner);
 
     const tokenIds = process.env.MANY_BUYER_COMBINE_TOKEN_IDS.split(",");
@@ -40,7 +38,7 @@ async function main() {
         transferAmounts.push(tokenAmount);
     }
 
-    if(transferBuyers.length != transferAmounts.length) {
+    if (transferBuyers.length != transferAmounts.length) {
         console.log("ERROR: The counts of Id and Amount are not matched");
         return;
     }
@@ -55,7 +53,8 @@ async function main() {
             transferBuyers[i],
             transferIds[i],
             transferAmounts[i],
-            buffer);
+            buffer
+        );
         console.log("%i Tokens Transferred to", transferAmounts[i], transferBuyers[i]);
     }
 }

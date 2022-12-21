@@ -1,11 +1,11 @@
 import { NonceManager } from "@ethersproject/experimental";
-import {BigNumber, BigNumberish, Wallet} from "ethers";
+import { BigNumber, BigNumberish, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
-import {string} from "hardhat/internal/core/params/argumentTypes";
-import {createTokenId, parseTokenId} from "../../utils/ParseTokenID";
+import { string } from "hardhat/internal/core/params/argumentTypes";
+import { createTokenId, parseTokenId } from "../../utils/ParseTokenID";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -14,9 +14,7 @@ async function main() {
     const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
     const creatorSigner = new NonceManager(new GasPriceManager(provider.getSigner(creator.address)));
 
-    const assetContract = await AssetContractFactory.attach(
-        process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    );
+    const assetContract = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
     const creatorContract = await assetContract.connect(creatorSigner);
 
     const batchCount = Number(process.env.FINPL_NFT_BATCH_COUNT || "1");
@@ -36,7 +34,7 @@ async function main() {
         tokenIdsStr += tokenId.toHexString() + " , ";
         tokenIds.push(tokenId);
     }
-    console.log("====== Combine tokenIds(HEX) ======")
+    console.log("====== Combine tokenIds(HEX) ======");
     console.log(tokenIdsStr.slice(0, -3));
     console.log("====== Combine tokenIds ======");
     for (let id of tokenIds) {

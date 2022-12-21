@@ -4,7 +4,7 @@ import { Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../utils/GasPriceManager";
 import { ConduitControllerInterface } from "../typechain-types";
-import {expect} from "chai";
+import { expect } from "chai";
 
 async function main() {
     const ConduitControllerFactory = await ethers.getContractFactory("ConduitController");
@@ -13,14 +13,11 @@ async function main() {
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
 
-    const conduitContorller = await ConduitControllerFactory.attach(
-        process.env.CONDUIT_CONTROLLER_ADDRESS || ""
-    );
+    const conduitContorller = await ConduitControllerFactory.attach(process.env.CONDUIT_CONTROLLER_ADDRESS || "");
     const ownerConduitContorller = await conduitContorller.connect(adminSigner);
 
     const conduitKeyOne = process.env.CONDUIT_KEY || "";
-    const { conduit: conduitOneAddress, exists } =
-        await ownerConduitContorller.getConduit(conduitKeyOne);
+    const { conduit: conduitOneAddress, exists } = await ownerConduitContorller.getConduit(conduitKeyOne);
 
     expect(exists).to.be.true;
 

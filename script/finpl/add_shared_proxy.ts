@@ -12,9 +12,7 @@ async function main() {
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
 
-    const assetContract = await AssetContractFactory.attach(
-        process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    );
+    const assetContract = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
     const ownerContract = await assetContract.connect(adminSigner);
 
     await ownerContract.addSharedProxyAddress(proxy.address);

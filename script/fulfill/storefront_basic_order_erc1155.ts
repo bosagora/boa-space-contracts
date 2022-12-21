@@ -3,11 +3,11 @@ import { expect } from "chai";
 import { BigNumber, BigNumberish, Wallet } from "ethers";
 import { recoverAddress } from "ethers/lib/utils";
 import { ethers } from "hardhat";
-import {getBasicOrderExecutions, getBasicOrderParameters, getItemETH, toBN, toKey} from "../../test/utils/encoding";
-import {ConduitController, Consideration, Seaport, SharedStorefrontLazyMintAdapter} from "../../typechain-types";
+import { getBasicOrderExecutions, getBasicOrderParameters, getItemETH, toBN, toKey } from "../../test/utils/encoding";
+import { ConduitController, Consideration, Seaport, SharedStorefrontLazyMintAdapter } from "../../typechain-types";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { checkExpectedEvents, createOrder, setContracts, withBalanceChecks } from "../../utils/CommonFunctions";
-import type {ConsiderationItem, OfferItem} from "../../test/utils/types";
+import type { ConsiderationItem, OfferItem } from "../../test/utils/types";
 const { parseEther, keccak256 } = ethers.utils;
 
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
@@ -51,9 +51,7 @@ async function main() {
         },
     ];
 
-    const consideration = [
-        getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address),
-    ];
+    const consideration = [getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address)];
 
     const { order, orderHash, value } = await createOrder(
         offerer,
@@ -69,14 +67,11 @@ async function main() {
     console.log("orderHash:", orderHash);
     console.log("value:", value);
 
-    const tx = marketplace
-        .connect(fulfillerSigner)
-        .fulfillOrder(order, toKey(0), {
-            value,
-        });
+    const tx = marketplace.connect(fulfillerSigner).fulfillOrder(order, toKey(0), {
+        value,
+    });
     const receipt = await (await tx).wait();
     console.log("receipt after fulfullOrder transaction:\n", receipt);
-
 }
 
 // We recommend this pattern to be able to use async/await everywhere

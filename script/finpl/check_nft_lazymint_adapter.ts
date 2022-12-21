@@ -1,6 +1,6 @@
 import { NonceManager } from "@ethersproject/experimental";
 import { create } from "domain";
-import {BigNumber, Wallet} from "ethers";
+import { BigNumber, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 
@@ -8,9 +8,7 @@ async function main() {
     const LazyMintAdapterFactory = await ethers.getContractFactory("SharedStorefrontLazyMintAdapter");
 
     const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
-    const lazymintAdapter = await LazyMintAdapterFactory.attach(
-        process.env.LAZY_MINT_ADAPTER_ADDRESS || ""
-    );
+    const lazymintAdapter = await LazyMintAdapterFactory.attach(process.env.LAZY_MINT_ADAPTER_ADDRESS || "");
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
 
     console.log("====== Minted NFT information ======");

@@ -80,7 +80,7 @@ describe(`Fulfilling a basic order offering NFT and getting BOA(BOASPACE)`, func
         // Create a conduit with ConduitController
         const conduitKeyOne = `${admin.address}000000000000000000000000`;
         await conduitController.createConduit(conduitKeyOne, admin.address);
-        const {conduit: conduitAddress, exists} = await conduitController.getConduit(conduitKeyOne);
+        const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKeyOne);
         console.log("ConduitAddress:", conduitAddress, "exists: ", exists);
 
         // Deploy Seaport contract
@@ -91,9 +91,7 @@ describe(`Fulfilling a basic order offering NFT and getting BOA(BOASPACE)`, func
 
         // Deploy SharedStorefrontLazyMintAdapter
         const lazymintAdapterFactory = await ethers.getContractFactory("SharedStorefrontLazyMintAdapter");
-        lazymintAdapter = await lazymintAdapterFactory.connect(admin).deploy(
-            assetToken.address
-        );
+        lazymintAdapter = await lazymintAdapterFactory.connect(admin).deploy(assetToken.address);
         await lazymintAdapter.deployed();
         console.log("SharedStorefrontLazyMintAdapter:", lazymintAdapter.address);
 
@@ -123,8 +121,7 @@ describe(`Fulfilling a basic order offering NFT and getting BOA(BOASPACE)`, func
         console.log("token id:", tokenId);
         console.log("uri:", await assetToken.uri(tokenId));
         console.log("creator:", await assetToken.creator(tokenId));
-        console.log("balance of creator:",
-            (await assetToken.balanceOf(offerer.address, tokenId)).toString());
+        console.log("balance of creator:", (await assetToken.balanceOf(offerer.address, tokenId)).toString());
 
         const itemType: number = 3;
         const token: string = assetToken.address;
@@ -141,9 +138,7 @@ describe(`Fulfilling a basic order offering NFT and getting BOA(BOASPACE)`, func
             },
         ];
 
-        const consideration = [
-            getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address),
-        ];
+        const consideration = [getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address)];
 
         const { order, orderHash, value } = await createOrder(
             offerer,

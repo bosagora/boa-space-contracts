@@ -11,9 +11,7 @@ async function main() {
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
 
     const tokenAddress = process.env.ASSET_CONTRACT_SHARED_ADDRESS || "";
-    const lazymintAdapter = await LazymintAdapterFactory.connect(adminSigner).deploy(
-        tokenAddress
-    );
+    const lazymintAdapter = await LazymintAdapterFactory.connect(adminSigner).deploy(tokenAddress);
     await lazymintAdapter.deployed();
 
     console.log("SharedStorefrontLazyMintAdapter - deployed to:", lazymintAdapter.address);

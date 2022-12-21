@@ -1,5 +1,5 @@
 import { NonceManager } from "@ethersproject/experimental";
-import { BigNumber, Wallet} from "ethers";
+import { BigNumber, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
@@ -12,9 +12,7 @@ async function main() {
     const buyer = process.env.TRANSFER_BUYER || "";
     const proxy = new Wallet(process.env.SHARED_PROXY_KEY || "");
     const proxySigner = new NonceManager(new GasPriceManager(provider.getSigner(proxy.address)));
-    const assetContract = await AssetContractFactory.attach(
-        process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    );
+    const assetContract = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
     const proxyContract = await assetContract.connect(proxySigner);
 
     const tokenIds = process.env.TRANSFER_COMBINE_TOKEN_IDS.split(",");
@@ -35,18 +33,13 @@ async function main() {
         transferAmounts.push(tokenAmount);
     }
 
-    if(transferIds.length != transferAmounts.length) {
+    if (transferIds.length != transferAmounts.length) {
         console.log("ERROR: The counts of Id and Amount are not matched");
         return;
     }
 
     const buffer = ethers.utils.toUtf8Bytes("");
-    await proxyContract.safeBatchTransferFrom(
-        creator.address,
-        buyer,
-        transferIds,
-        transferAmounts,
-        buffer);
+    await proxyContract.safeBatchTransferFrom(creator.address, buyer, transferIds, transferAmounts, buffer);
 
     console.log(transferIds);
     console.log("Tokens Transferred to", buyer);

@@ -13,72 +13,68 @@ const { parseEther, keccak256 } = ethers.utils;
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
 
 async function main() {
-  const SeaportFactory = await ethers.getContractFactory("Seaport");
-  const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
-  const provider = ethers.provider;
+    const SeaportFactory = await ethers.getContractFactory("Seaport");
+    const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
+    const provider = ethers.provider;
 
-  const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
-  const owner = new Wallet(process.env.OWNER_KEY || "");
-  const admin = new Wallet(process.env.ADMIN_KEY || "");
-  const zone = new Wallet(process.env.ZONE_KEY || "");
-  const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
-  const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
-  const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
-  const marketplaceContract = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
-  const sharedAsset = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
-  const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
-  setContracts(marketplaceContract, sharedAsset);
+    const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
+    const owner = new Wallet(process.env.OWNER_KEY || "");
+    const admin = new Wallet(process.env.ADMIN_KEY || "");
+    const zone = new Wallet(process.env.ZONE_KEY || "");
+    const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
+    const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
+    const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
+    const marketplaceContract = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
+    const sharedAsset = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
+    const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
+    setContracts(marketplaceContract, sharedAsset);
 
-  // approve to the marketplace
-  await sharedAsset.connect(adminSigner).setApprovalForAll(marketplaceContract.address, true);
-  // await sharedAsset.connect(adminSigner).addSharedProxyAddress(marketplaceContract.address);
-  console.log("SetApprovalForAll called");
+    // approve to the marketplace
+    await sharedAsset.connect(adminSigner).setApprovalForAll(marketplaceContract.address, true);
+    // await sharedAsset.connect(adminSigner).addSharedProxyAddress(marketplaceContract.address);
+    console.log("SetApprovalForAll called");
 
-  const itemType: number = 3;
-  const token: string = sharedAsset.address;
-  const identifierOrCriteria: BigNumberish = tokenId;
-  const startAmount: BigNumberish = BigNumber.from(1);
-  const endAmount: BigNumberish = BigNumber.from(1);
-  const offer: OfferItem[] = [
-    {
-      itemType,
-      token,
-      identifierOrCriteria: toBN(identifierOrCriteria),
-      startAmount: toBN(startAmount),
-      endAmount: toBN(endAmount),
-    },
-  ];
+    const itemType: number = 3;
+    const token: string = sharedAsset.address;
+    const identifierOrCriteria: BigNumberish = tokenId;
+    const startAmount: BigNumberish = BigNumber.from(1);
+    const endAmount: BigNumberish = BigNumber.from(1);
+    const offer: OfferItem[] = [
+        {
+            itemType,
+            token,
+            identifierOrCriteria: toBN(identifierOrCriteria),
+            startAmount: toBN(startAmount),
+            endAmount: toBN(endAmount),
+        },
+    ];
 
-  const consideration = [
-    getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address),
-  ];
+    const consideration = [getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address)];
 
-  const { order, orderHash, value } = await createOrder(
-    offerer,
-    ZeroAddress,
-    offer,
-    consideration,
-    0 // FULL_OPEN
-  );
+    const { order, orderHash, value } = await createOrder(
+        offerer,
+        ZeroAddress,
+        offer,
+        consideration,
+        0 // FULL_OPEN
+    );
 
-  console.log("order:", order);
-  console.log("offer:", order.parameters.offer);
-  console.log("consideration:", order.parameters.consideration);
-  console.log("orderHash:", orderHash);
-  console.log("value:", value);
+    console.log("order:", order);
+    console.log("offer:", order.parameters.offer);
+    console.log("consideration:", order.parameters.consideration);
+    console.log("orderHash:", orderHash);
+    console.log("value:", value);
 
-  const tx = marketplaceContract
-    .connect(fulfillerSigner)
-    .fulfillOrder(order, toKey(0), {
-      value,
+    const tx = marketplaceContract.connect(fulfillerSigner).fulfillOrder(order, toKey(0), {
+        value,
     });
-  const receipt = await (await tx).wait();
-  console.log("receipt after fulfullOrder transaction:\n", receipt);
+    const receipt = await (await tx).wait();
+    console.log("receipt after fulfullOrder transaction:\n", receipt);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
+    console.error(error);
+    process.exitCode = 1;
 });

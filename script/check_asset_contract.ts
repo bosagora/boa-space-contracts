@@ -4,7 +4,7 @@ import { Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { GasPriceManager } from "../utils/GasPriceManager";
 import { ConduitControllerInterface } from "../typechain-types";
-import {expect} from "chai";
+import { expect } from "chai";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -13,11 +13,9 @@ async function main() {
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
 
-    const assetContract = await AssetContractFactory.attach(
-        process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    );
+    const assetContract = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
 
-    console.log("====== AssetContractShared information ======")
+    console.log("====== AssetContractShared information ======");
     console.log("address:", process.env.ASSET_CONTRACT_SHARED_ADDRESS);
     console.log("name:", await assetContract.name());
     console.log("symbol:", await assetContract.symbol());

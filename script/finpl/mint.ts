@@ -4,8 +4,8 @@ import { ethers } from "hardhat";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import { AssetContractShared } from "../../typechain-types";
 import { delay } from "@nomiclabs/hardhat-etherscan/dist/src/etherscan/EtherscanService";
-import {createTokenId, parseTokenId} from "../../utils/ParseTokenID";
-import {token} from "../../typechain-types/@openzeppelin/contracts";
+import { createTokenId, parseTokenId } from "../../utils/ParseTokenID";
+import { token } from "../../typechain-types/@openzeppelin/contracts";
 
 async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
@@ -14,9 +14,7 @@ async function main() {
     const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
     const creatorSigner = new NonceManager(new GasPriceManager(provider.getSigner(creator.address)));
 
-    const assetContract = await AssetContractFactory.attach(
-        process.env.ASSET_CONTRACT_SHARED_ADDRESS || ""
-    )
+    const assetContract = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
     const creatorContract = await assetContract.connect(creatorSigner);
 
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");

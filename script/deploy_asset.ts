@@ -13,7 +13,7 @@ async function main() {
     const name = process.env.ASSET_CONTRACT_NAME || "";
     const symbol = process.env.ASSET_CONTRACT_SYMBOL || "";
     const templateURI = process.env.ASSET_CONTRACT_TEMPLATE_URI || "";
-    console.log(name , ",", symbol, ",", templateURI);
+    console.log(name, ",", symbol, ",", templateURI);
     const assetContract = await AssetContractFactory.connect(adminSigner).deploy(
         name,
         symbol,
