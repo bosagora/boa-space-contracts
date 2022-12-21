@@ -31,8 +31,7 @@ async function main() {
     setContracts(marketplace, assetToken);
 
     // set the shared proxy of assetToken to SharedStorefront
-    await assetToken.connect(adminSigner).setApprovalForAll(marketplace.address, true);
-    // await assetToken.connect(adminSigner).addSharedProxyAddress(marketplace.address);
+    await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);
 
     // TODO: Make utility functions creating offer and consideration
 

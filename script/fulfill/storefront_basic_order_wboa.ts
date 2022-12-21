@@ -37,8 +37,7 @@ async function main() {
     setContracts(marketplace, assetToken);
 
     // set the shared proxy of assetToken to SharedStorefront
-    await assetToken.connect(adminSigner).setApprovalForAll(marketplace.address, true);
-    // await assetToken.connect(adminSigner).addSharedProxyAddress(marketplace.address);
+    await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);
 
     // The needed amount of WBOA for trading
     const sellerAmount = ethers.utils.parseEther("0.1");
