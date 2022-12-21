@@ -27,9 +27,9 @@ import { IERC1155 } from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 contract SharedStorefrontLazyMintAdapter {
     IERC1155 immutable ssfToken;
     address private constant SEAPORT =
-    0x70E98Ae72a7CBaE517a3944E07229b3D36B51d5d;
+    0x4F445109d11419c3612e43D2e71a3593921621E0;
     address private constant CONDUIT =
-    0xCb367fE0E4c775c8488347Ce61A43c6b49a4ed21;
+    0xCef34f700b0F060fAA00E91001259E80Fcdc9570;
 
     error InsufficientBalance();
     error UnauthorizedCaller();
