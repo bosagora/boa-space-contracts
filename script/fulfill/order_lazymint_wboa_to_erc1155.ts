@@ -40,7 +40,6 @@ async function main() {
     const nftBuyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftBuyer.address)));
     const nftSeller = new Wallet(process.env.ORDER_NFT_SELLER_KEY || "");
     const nftSellerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftSeller.address)));
-    const conduitAddress = process.env.CONDUIT_ADDRESS;
     const conduitKey = process.env.CONDUIT_KEY || "";
 
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
@@ -51,8 +50,8 @@ async function main() {
     console.log("new token id:", newTokenId);
     setSeaport(marketplace);
 
-    const { conduit: conduitAddr, exists } = await conduitController.getConduit(conduitKey);
-    console.log("conduitKey: %s, conduitAddress: %s", conduitKey, conduitAddr);
+    const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
+    console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);

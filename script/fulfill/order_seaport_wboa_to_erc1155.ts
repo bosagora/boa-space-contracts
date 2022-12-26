@@ -26,13 +26,16 @@ async function main() {
     const nftBuyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftBuyer.address)));
     const nftSeller = new Wallet(process.env.ORDER_NFT_SELLER_KEY || "");
     const nftSellerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftSeller.address)));
-    const conduitAddress = process.env.CONDUIT_ADDRESS;
+    const conduitKey = process.env.CONDUIT_KEY || "";
     const marketplace = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
     const storefront = await StorefrontFactory.attach(process.env.LAZY_MINT_ADAPTER_ADDRESS || "");
     const conduitController = await ConduitControlFactory.attach(process.env.CONDUIT_CONTROLLER_ADDRESS);
     const assetToken = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS);
     const wboaToken = await WBOAFactory.attach(process.env.WBOA_ADDRESS);
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
+
+    const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
+    console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);
 
     setContracts(marketplace, assetToken);
 
