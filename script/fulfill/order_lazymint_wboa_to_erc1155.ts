@@ -49,7 +49,6 @@ async function main() {
     const newTokenId = createTokenId(nftSeller.address, tokenIndex, quantity);
 
     console.log("new token id:", newTokenId);
-    setChainId(2019);
     setSeaport(marketplace);
 
     const { conduit: conduitAddr, exists } = await conduitController.getConduit(conduitKey);
