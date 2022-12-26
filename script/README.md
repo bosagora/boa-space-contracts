@@ -1,9 +1,10 @@
 # Contents
 - [Deployment of contracts](#deployment-of-contracts)
   - [Deploying ConduitController contract](#deploying-conduitcontraoller-contract)
+  - [Creating Conduit](#creating-conduit)
   - [Deploying Seaport contract](#deploying-seaport-contract)
-  - [Deploying SharedStorefrontLazymintAdapter contract](#deploying-sharedstorefrontlazymintadapter-contract)
   - [Deploying AssetContractShared contract](#deploying-assetcontractshared-contract)
+  - [Deploying SharedStorefrontLazymintAdapter contract](#deploying-sharedstorefrontlazymintadapter-contract)
 - [Minting an AssetContract NFT](#minting-an-assetcontractshared-nft)
   - [Set information and mint an NFT token](#set-information-and-mint-an-nft-token)
   - [Check the information of the minted NFT token](#check-the-information-of-the-minted-nft-token)
@@ -36,6 +37,32 @@ You should set the deployed address of the `ConduitContraoller` contract into th
 CONDUIT_CONTROLLER_ADDRESS=0xFB15f7cB1E06544A791DbEd6AfdB9C705bF5eF60
 ```
 
+## Creating Conduit
+We use a default conduit in the BosSpace, so we need to creating the conduit which should be set the `SharedStorefrontLazymintAdapter` contract.
+
+Run this script for creating the default conduit.
+```
+npx hardhat run script/create_conduit.ts --network testnet
+```
+
+You get the result of creating the conduit.
+```
+Conduit for conduitKey: 0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7000000000000000000000000 created.
+Please chech the Conduit address `get_conduit.ts`.
+```
+
+Set the conduit key to the .env file.
+```
+CONDUIT_KEY=0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7000000000000000000000000
+```
+
+And just check the conduit address for the conduit key. 
+```
+$ npx hardhat run script/get_conduit.ts --network testnet   
+Conduit address: 0x69e6535db62cE2ecf147Bf9F7B036D72bcC002AB
+conduitKey:  0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7000000000000000000000000
+```
+
 ## Deploying Seaport contract
 Run this script for deploying the contract.
 ```
@@ -51,20 +78,6 @@ You should set the deployed address of the `Seaport` contract into the `SEAPORT_
 SEAPORT_ADDRESS=0xB38C5e7ecAe4a2E3B11E69AA98D9C5F087De8C90
 ```
 
-## Deploying SharedStorefrontLazymintAdapter contract
-Run this script for deploying the contract.
-```
-npx hardhat run script/deploy_lazymint_adapter.ts --network testnet
-```
-You get the result of deploying the contract.
-```
-SharedStorefrontLazyMintAdapter - deployed to: 0xE11FDE48B267C0d4c56e38E7c7868aE5aE2C59Dd
-```
-
-You should set the deployed address of the `SharedStorefrontLazymintAdapter` contract into the `LAZY_MINT_ADAPTER_ADDRESS` constant in `.env` file.
-```
-LAZY_MINT_ADAPTER_ADDRESS=0xE11FDE48B267C0d4c56e38E7c7868aE5aE2C59Dd
-```
 
 ## Deploying AssetContractShared contract
 Set the `name`, `symbol`, `templateURI` in the `.env` file which are the properties of the contract. The value of `templateURI` is optional.
@@ -97,7 +110,36 @@ symbol: BOASTORE
 templateURI: 
 ```
 
+## Deploying SharedStorefrontLazymintAdapter contract
+Before this contract we should set the following hardcoded state variables in the `SharedStorefrontLazyMintAdapter.sol`.
+```solidity
+address private constant SEAPORT = 0x4F445109d11419c3612e43D2e71a3593921621E0;
+address private constant CONDUIT = 0xCef34f700b0F060fAA00E91001259E80Fcdc9570;
+```
+- SEAPORT: the address of the `Seaport` contract
+- CONDUIT: the address of the `Conduit` contract which is created from [this section](#creating-conduit).
+
+Run this script for deploying the contract.
+```
+npx hardhat run script/deploy_lazymint_adapter.ts --network testnet
+```
+You get the result of deploying the contract.
+```
+SharedStorefrontLazyMintAdapter - deployed to: 0xE11FDE48B267C0d4c56e38E7c7868aE5aE2C59Dd
+```
+
+You should set the deployed address of the `SharedStorefrontLazymintAdapter` contract into the `LAZY_MINT_ADAPTER_ADDRESS` constant in `.env` file.
+```
+LAZY_MINT_ADAPTER_ADDRESS=0xE11FDE48B267C0d4c56e38E7c7868aE5aE2C59Dd
+```
+
 # Minting an AssetContractShared NFT
+## Setting the shared proxy of AssetContractShared
+The deployer that is represented as `ADMIN_KEY` in .env file should get the role of the shared proxy for some scripts like `transfer_batch.ts` and `transfer_buyer.ts`. So you should run this script before transferring `AssetContractShared` NFT tokens. 
+```
+npx hardhat run script/finpl/add_shared_proxy.ts --network testnet
+```
+
 ## Set information and mint an NFT token
 You should mint an NFT token before trading. This is a description of how to mint an NFT token. You could mint FINPL tokens also with these commands.
 
@@ -156,36 +198,36 @@ We describe how to use scripts to fulfill an order and check it in three ways.
 This description is the steps for trading NFTs in [TestNet](https://testnet.boascan.io).
 
 ## Prerequisites
-You should set the keys of the offerer and the fulfiller in the `.env` file. You should copy the `.env.sample` to `.env` file if there is no `.env` file in your local environment.
+You should set the keys of the NFT buyer and the NFT buyer in the `.env` file. You should copy the `.env.sample` to `.env` file if there is no `.env` file in your local environment.
 
 ```
 # Fulfilling an Order
-ORDER_OFFERER_KEY=0x158ad623fa14d8ca6bce416b877905b2d11d3842ddd4adbb71332e809263abb5
-ORDER_FULFILLER_KEY=0xbacfa3fbe768c1665feee09af7182ae53ca9a334db747b3751149f81e448ac26
+ORDER_NFT_BUYER_KEY=0x158ad623fa14d8ca6bce416b877905b2d11d3842ddd4adbb71332e809263abb5
+ORDER_NFT_SELLER_KEY=0xbacfa3fbe768c1665feee09af7182ae53ca9a334db747b3751149f81e448ac26
 ```
 
-- `ORDER_OFFERER_KEY` is for the key of the offerer who creates an order having an offer of BOAs, WBOAs, or ERC1155 compatible tokens with considerations that could have the same kind of tokens as the offer.
-- `ORDER_FULFILLER_KEY` is for the key of the fulfiller who fulfills an order, which means that the fulfiller gives the consideration in response to getting the offer. 
+- `ORDER_NFT_BUYER_KEY` is for the key of the buyer who creates an order having an offer of BOAs and WBOAs, or fulfills the order. 
+- `ORDER_NFT_SELLER_KEY` is for the key of the seller who fulfills an order from seller or creates an order having NFT tokens he/she owns.
 
 You should check the balances of the offerer and fulfiller with the following command.
 ```typescript
-npx hardhat run script/fulfill/check_fulfill.ts --network testnet
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 And you can get the following information about balances of BOA, WBOA, and NFTs for the offerer and fulfiller from the network.
 ```
 ====== Asset Token
-address: 0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd
-creator: 0xAcb913db781a46611fAa04Ff6Cb9A370df069eed
-====== Offerer
+contract address: 0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd
+NFT creator: 0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7
+====== NFT seller
+address: 0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7
+BOA     : 11056865472547138871909
+WBOA    : 5100000000000000000
+Asset amount    : 87
+====== NFT buyer
 address: 0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53
-BOA     : 999888197909644923579
-WBOA    : 1900000000000000000
-Asset amount    : 1
-====== Fulfiller
-address: 0xAcb913db781a46611fAa04Ff6Cb9A370df069eed
-BOA     : 8966085233549931187837
-WBOA    : 35100000000000000000
-Asset amount    : 99
+BOA     : 995179832817305886482
+WBOA    : 1200000000000000000
+Asset amount    : 113
 ```
 
 We summarize the addresses for the contracts that are used frequently in this document.
@@ -201,11 +243,11 @@ This describes the steps for fulfilling an order that consists of an offer havin
 
 You should check the balances of the offerer and fulfiller with this command before fulfilling an order.
 ```
-npx hardhat run script/fulfill/check_fulfill.ts --network testnet
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 And run this command for fulfilling an order.
 ```
-npx hardhat run script/fulfill/storefront_basic_order_erc1155.ts --network testnet
+npx hardhat run script/fulfill/order_seaport_erc1155_to_boa.ts --network testnet
 ```
 The details of the order as follows.
 ```typescript
@@ -256,9 +298,9 @@ consideration: [
 
 ```
 
-You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had checked the balances of the offerer and buyer before fulfilling the order.
+You should check the result of fulfilling an order with the `check_fulfill_order.ts` script as you had checked the balances of the offerer and buyer before fulfilling the order.
 ```
-npx hardhat run script/fulfill/check_fulfill.ts --network testnet
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 
 ### Offer WBOA and receive NFT as consideration
@@ -266,11 +308,11 @@ This describes fulfilling an order that consists of an offer having an 0.1 `WBOA
 
 You should check the balances of the offerer and fulfiller with this command.
 ```
-npx hardhat run script/fulfill/check_fulfill.ts --network testnet
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 And run this command for fulfilling an order.
 ```
-npx hardhat run script/fulfill/storefront_basic_order_wboa.ts --network testnet
+npx hardhat run script/fulfill/order_seaport_wboa_to_erc1155.ts --network testnet
 ```
 The details of the order are as follows.
 ```typescript
@@ -320,9 +362,9 @@ consideration: [
 ]
 ```
 
-You should check the result of fulfilling an order with the `check_fulfills.ts` script as you had check the balances of the offerer and fulfiller before fulfilling the order.
+You should check the result of fulfilling an order with the `check_fulfill_order.ts` script as you had check the balances of the offerer and fulfiller before fulfilling the order.
 ```
-npx hardhat run script/fulfill/check_fulfill.ts --network testnet 
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
 ```
 
 ## Fulfill through the `Seaport` and `Conduit`
@@ -332,7 +374,7 @@ npx hardhat run script/fulfill/check_fulfill.ts --network testnet
 ## Fulfill only through the `Seaport`
 This describes the steps for fulfilling an order that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through the `Seaport` contract without `SharedStorefrontLazyMintAdapter` or `Conduit` contracts.
 ```
-npx hardhat run script/fulfill/asset_basic_order_erc1155.ts --network testnet 
+npx hardhat run script/fulfill/order_asset_erc1155_to_boa.ts --network testnet
 ```
 The order will have similar components as follows.
 ```typescript
@@ -382,7 +424,7 @@ consideration: [
 
 ```
 
-You should check the result with the `check_fulfills.ts` script as you had checked the status of the offerer and fulfiller before fulfilling the order.
+You should check the result with the `check_fulfill_order.ts` script as you had checked the status of the offerer and fulfiller before fulfilling the order.
 ```
-npx hardhat run script/fulfill/check_fulfill.ts --network testnet
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
