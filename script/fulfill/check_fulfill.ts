@@ -25,25 +25,25 @@ async function main() {
     const WBOAFactory = await ethers.getContractFactory("WBOA9");
 
     const creator = new Wallet(process.env.FINPL_NFT_CREATOR_KEY || "");
-    const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
-    const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
+    const nftBuyer = new Wallet(process.env.ORDER_NFT_BUYER_KEY || "");
+    const nftSeller = new Wallet(process.env.ORDER_NFT_SELLER_KEY || "");
     const assetToken = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS || "");
     const wboaToken = await WBOAFactory.attach(process.env.WBOA_ADDRESS);
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
 
     console.log("====== Asset Token");
-    console.log("address:", assetToken.address);
-    console.log("creator:", creator.address);
-    console.log("====== Offerer");
-    console.log("address:", offerer.address);
-    console.log("BOA\t:", (await provider.getBalance(offerer.address)).toString());
-    console.log("WBOA\t:", (await wboaToken.getBalance(offerer.address)).toString());
-    console.log("Asset amount\t:", (await assetToken.balanceOf(offerer.address, tokenId)).toString());
-    console.log("====== Fulfiller");
-    console.log("address:", fulfiller.address);
-    console.log("BOA\t:", (await provider.getBalance(fulfiller.address)).toString());
-    console.log("WBOA\t:", (await wboaToken.getBalance(fulfiller.address)).toString());
-    console.log("Asset amount\t:", (await assetToken.balanceOf(fulfiller.address, tokenId)).toString());
+    console.log("contract address:", assetToken.address);
+    console.log("NFT creator:", creator.address);
+    console.log("====== NFT seller");
+    console.log("address:", nftSeller.address);
+    console.log("BOA\t:", (await provider.getBalance(nftSeller.address)).toString());
+    console.log("WBOA\t:", (await wboaToken.getBalance(nftSeller.address)).toString());
+    console.log("Asset amount\t:", (await assetToken.balanceOf(nftSeller.address, tokenId)).toString());
+    console.log("====== NFT buyer");
+    console.log("address:", nftBuyer.address);
+    console.log("BOA\t:", (await provider.getBalance(nftBuyer.address)).toString());
+    console.log("WBOA\t:", (await wboaToken.getBalance(nftBuyer.address)).toString());
+    console.log("Asset amount\t:", (await assetToken.balanceOf(nftBuyer.address, tokenId)).toString());
 }
 
 // We recommend this pattern to be able to use async/await everywhere

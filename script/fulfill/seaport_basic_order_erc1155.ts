@@ -18,11 +18,11 @@ async function main() {
     const AssetContractFactory = await ethers.getContractFactory("AssetContractShared");
     const provider = ethers.provider;
 
-    const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
+    const nftSeller = new Wallet(process.env.ORDER_NFT_SELLER_KEY || "");
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
-    const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
-    const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
+    const nftBuyer = new Wallet(process.env.ORDER_NFT_BUYER_KEY || "");
+    const nftBuyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftBuyer.address)));
     const marketplace = await SeaportFactory.attach(process.env.SEAPORT_ADDRESS || "");
     const storefront = await StorefrontFactory.attach(process.env.LAZY_MINT_ADAPTER_ADDRESS || "");
     const assetToken = await AssetContractFactory.attach(process.env.ASSET_CONTRACT_SHARED_ADDRESS);
@@ -35,6 +35,7 @@ async function main() {
 
     // TODO: Make utility functions creating offer and consideration
 
+    // NFT seller creates an order that has an NFT token that he owns
     const itemType: number = 3;
     const token: string = storefront.address;
     const identifierOrCriteria: BigNumberish = tokenId;
@@ -50,10 +51,11 @@ async function main() {
         },
     ];
 
-    const consideration = [getItemETH(parseEther("0.1"), parseEther("0.1"), offerer.address)];
+    // Creating the first consideration which is goes to the NFT seller
+    const consideration = [getItemETH(parseEther("0.1"), parseEther("0.1"), nftSeller.address)];
 
     const { order, orderHash, value } = await createOrder(
-        offerer,
+        nftSeller,
         ZeroAddress,
         offer,
         consideration,
@@ -66,7 +68,7 @@ async function main() {
     console.log("orderHash:", orderHash);
     console.log("value:", value);
 
-    const tx = marketplace.connect(fulfillerSigner).fulfillOrder(order, toKey(0), {
+    const tx = marketplace.connect(nftBuyerSigner).fulfillOrder(order, toKey(0), {
         value,
     });
     const receipt = await (await tx).wait();

@@ -36,17 +36,17 @@ async function main() {
 
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
-    const offerer = new Wallet(process.env.ORDER_OFFERER_KEY || "");
-    const offererSigner = new NonceManager(new GasPriceManager(provider.getSigner(offerer.address)));
-    const fulfiller = new Wallet(process.env.ORDER_FULFILLER_KEY || "");
-    const fulfillerSigner = new NonceManager(new GasPriceManager(provider.getSigner(fulfiller.address)));
+    const nftBuyer = new Wallet(process.env.ORDER_NFT_BUYER_KEY || "");
+    const nftBuyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftBuyer.address)));
+    const nftSeller = new Wallet(process.env.ORDER_NFT_SELLER_KEY || "");
+    const nftSellerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftSeller.address)));
     const conduitAddress = process.env.CONDUIT_ADDRESS;
     const conduitKey = process.env.CONDUIT_KEY || "";
 
     const quantity = Number(process.env.FINPL_NFT_QUANTITY || "1");
     const tokenIndex = BigNumber.from(process.env.FINPL_NFT_INDEX || "0");
     const data = process.env.FINPL_NFT_DATA || "";
-    const newTokenId = createTokenId(fulfiller.address, tokenIndex, quantity);
+    const newTokenId = createTokenId(nftSeller.address, tokenIndex, quantity);
 
     console.log("new token id:", newTokenId);
     setChainId(2019);
@@ -59,8 +59,8 @@ async function main() {
     await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);
 
     // approve WBOAs of seller to the Conduit
-    let selerAmountTotal = await provider.getBalance(offerer.address);
-    await wboaToken.connect(offererSigner).approve(conduitAddress, selerAmountTotal);
+    let selerAmountTotal = await provider.getBalance(nftBuyer.address);
+    await wboaToken.connect(nftBuyerSigner).approve(conduitAddress, selerAmountTotal);
 
     // update channel for marketplace to conduit
     let status = await conduitController.connect(adminSigner).getChannelStatus(conduitAddress, marketplace.address);
@@ -70,46 +70,49 @@ async function main() {
     }
 
     // The needed amount of WBOA for trading
-    const sellerAmount = ethers.utils.parseEther("0.1");
-    const reserveAmount = ethers.utils.parseEther("1.0");
+    const tokenPriceAmount = ethers.utils.parseEther("0.1");
+    const spareAmount = ethers.utils.parseEther("1.0");
 
     // Current status of seller, buyer, and nft
-    let amount = await provider.getBalance(offerer.address);
-    console.log("offerer(%s) balance:", offerer.address, amount.toString());
-    amount = await provider.getBalance(fulfiller.address);
-    console.log("fulfiller(%s) balance:", fulfiller.address, amount.toString());
+    let amount = await provider.getBalance(nftBuyer.address);
+    console.log("NFT buyer(%s) balance:", nftBuyer.address, amount.toString());
+    amount = await provider.getBalance(nftSeller.address);
+    console.log("NFT seller(%s) balance:", nftSeller.address, amount.toString());
     console.log("====== Minted NFT information ======");
     console.log("tokenId:", newTokenId.toHexString());
     console.log("creator:", await assetToken.creator(newTokenId));
-    console.log("balance of buyer:", await assetToken.balanceOf(fulfiller.address, newTokenId));
+    console.log("NFT balance of seller:", await assetToken.balanceOf(nftSeller.address, newTokenId));
 
-    // deposit BOA to WBOA contract from seller
-    amount = await wboaToken.getBalance(offerer.address);
-    if (amount <= sellerAmount.add(reserveAmount)) {
-        await wboaToken.connect(offererSigner).deposit({ value: sellerAmount.add(reserveAmount) });
+    // deposit BOA to WBOA contract from NFT buyer
+    amount = await wboaToken.getBalance(nftBuyer.address);
+    if (amount <= tokenPriceAmount.add(spareAmount)) {
+        await wboaToken.connect(nftBuyerSigner).deposit({ value: tokenPriceAmount.add(spareAmount) });
     }
-    amount = await wboaToken.getBalance(fulfiller.address);
-    if (amount <= reserveAmount) {
-        await wboaToken.connect(fulfillerSigner).deposit({ value: reserveAmount });
-    }
-    amount = await wboaToken.getBalance(offerer.address);
-    console.log("offerer WBOA:", amount.toString());
-    amount = await wboaToken.getBalance(fulfiller.address);
-    console.log("fulfiller WBOA:", amount.toString());
 
-    // Creating an offer which comes from seller
-    const sellerItemType: number = 1;
-    const sellerToken: string = wboaToken.address;
-    const sellerIdentifierOrCriteria: BigNumberish = 0;
-    const sellerStartAmount: BigNumberish = sellerAmount;
-    const sellerEndAmount: BigNumberish = sellerAmount;
+    // deposit BOA to WBOA contract from NFT seller
+    amount = await wboaToken.getBalance(nftSeller.address);
+    if (amount <= spareAmount) {
+        await wboaToken.connect(nftSellerSigner).deposit({ value: spareAmount });
+    }
+
+    amount = await wboaToken.getBalance(nftBuyer.address);
+    console.log("buyer's WBOA:", amount.toString());
+    amount = await wboaToken.getBalance(nftSeller.address);
+    console.log("seller's WBOA:", amount.toString());
+
+    // Creating an offer that comes from buyer
+    const offerItemType: number = 1;
+    const offerToken: string = wboaToken.address;
+    const offerIdentifierOrCriteria: BigNumberish = 0;
+    const offerStartAmount: BigNumberish = tokenPriceAmount;
+    const offerEndAmount: BigNumberish = tokenPriceAmount;
     const offer: OfferItem[] = [
         {
-            itemType: sellerItemType,
-            token: sellerToken,
-            identifierOrCriteria: toBN(sellerIdentifierOrCriteria),
-            startAmount: toBN(sellerStartAmount),
-            endAmount: toBN(sellerEndAmount),
+            itemType: offerItemType,
+            token: offerToken,
+            identifierOrCriteria: toBN(offerIdentifierOrCriteria),
+            startAmount: toBN(offerStartAmount),
+            endAmount: toBN(offerEndAmount),
         },
     ];
 
@@ -126,19 +129,19 @@ async function main() {
             identifierOrCriteria: toBN(identifierOrCriteria),
             startAmount: toBN(startAmount),
             endAmount: toBN(endAmount),
-            recipient: offerer.address,
+            recipient: nftBuyer.address,
         },
     ];
 
     const { order, orderHash, value } = await createOrder(
-        offerer,
+        nftBuyer,
         ZeroAddress,
         offer,
         consideration,
         1, // PARTIAL_OPEN
         [],
         null,
-        offerer,
+        nftBuyer,
         ethers.constants.HashZero,
         conduitKey
     );
@@ -147,7 +150,7 @@ async function main() {
     console.log("offer:", order.parameters.offer);
     console.log("consideration:", order.parameters.consideration);
 
-    const tx = marketplace.connect(fulfillerSigner).fulfillOrder(order, toKey(0), {
+    const tx = marketplace.connect(nftSellerSigner).fulfillOrder(order, toKey(0), {
         value,
     });
 

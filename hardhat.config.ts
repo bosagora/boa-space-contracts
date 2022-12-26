@@ -37,8 +37,8 @@ function getAccounts() {
     });
   }
   accounts[0].privateKey = process.env.ADMIN_KEY ?? "";
-  accounts[1].privateKey = process.env.ORDER_OFFERER_KEY ?? "";
-  accounts[2].privateKey = process.env.ORDER_FULFILLER_KEY ?? "";
+  accounts[1].privateKey = process.env.ORDER_NFT_BUYER_KEY ?? "";
+  accounts[2].privateKey = process.env.ORDER_NFT_SELLER_KEY ?? "";
 
   return accounts;
 }
@@ -116,8 +116,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
-        process.env.ORDER_OFFERER_KEY ?? "",
-        process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.ORDER_NFT_BUYER_KEY ?? "",
+        process.env.ORDER_NFT_SELLER_KEY ?? "",
         process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
@@ -130,8 +130,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
-        process.env.ORDER_OFFERER_KEY ?? "",
-        process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.ORDER_NFT_BUYER_KEY ?? "",
+        process.env.ORDER_NFT_SELLER_KEY ?? "",
         process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
@@ -144,8 +144,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
-        process.env.ORDER_OFFERER_KEY ?? "",
-        process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.ORDER_NFT_BUYER_KEY ?? "",
+        process.env.ORDER_NFT_SELLER_KEY ?? "",
         process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
@@ -158,8 +158,8 @@ const config: HardhatUserConfig = {
         process.env.OWNER_KEY ?? "",
         process.env.ZONE_KEY ?? "",
         process.env.BUYER_KEY ?? "",
-        process.env.ORDER_OFFERER_KEY ?? "",
-        process.env.ORDER_FULFILLER_KEY ?? "",
+        process.env.ORDER_NFT_BUYER_KEY ?? "",
+        process.env.ORDER_NFT_SELLER_KEY ?? "",
         process.env.FINPL_NFT_CREATOR_KEY ?? "",
       ],
     },
