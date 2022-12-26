@@ -3,17 +3,18 @@ import { expect } from "chai";
 import { BigNumber, BigNumberish, Wallet } from "ethers";
 import { recoverAddress } from "ethers/lib/utils";
 import { ethers } from "hardhat";
-import {getBasicOrderExecutions, getBasicOrderParameters, getItemETH, toBN, toKey} from "../../test/utils/encoding";
-import {ConduitController, Consideration, Seaport, SharedStorefrontLazyMintAdapter} from "../../typechain-types";
+import { getBasicOrderExecutions, getBasicOrderParameters, getItemETH, toBN, toKey } from "../../test/utils/encoding";
+import { ConduitController, Consideration, Seaport, SharedStorefrontLazyMintAdapter } from "../../typechain-types";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import {
     checkExpectedEvents,
-    createOrder, setChainId,
+    createOrder,
+    setChainId,
     setContracts,
     setSeaport,
-    withBalanceChecks
+    withBalanceChecks,
 } from "../../utils/CommonFunctions";
-import type {ConsiderationItem, OfferItem} from "../../test/utils/types";
+import type { ConsiderationItem, OfferItem } from "../../test/utils/types";
 const { parseEther, keccak256 } = ethers.utils;
 
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
@@ -84,15 +85,11 @@ async function main() {
     // deposit BOA to WBOA contract from seller
     amount = await wboaToken.getBalance(offerer.address);
     if (amount <= sellerAmount.add(reserveAmount)) {
-        await wboaToken.connect(offererSigner).deposit(
-            {value: sellerAmount.add(reserveAmount)}
-        );
+        await wboaToken.connect(offererSigner).deposit({ value: sellerAmount.add(reserveAmount) });
     }
     amount = await wboaToken.getBalance(fulfiller.address);
     if (amount <= reserveAmount) {
-        await wboaToken.connect(fulfillerSigner).deposit(
-            {value: reserveAmount}
-        );
+        await wboaToken.connect(fulfillerSigner).deposit({ value: reserveAmount });
     }
     amount = await wboaToken.getBalance(offerer.address);
     console.log("seller's WBOA:", amount.toString());
@@ -113,7 +110,7 @@ async function main() {
             token: sellerToken,
             identifierOrCriteria: toBN(sellerIdentifierOrCriteria),
             startAmount: toBN(sellerStartAmount),
-            endAmount: toBN(sellerEndAmount)
+            endAmount: toBN(sellerEndAmount),
         },
     ];
 
@@ -131,11 +128,11 @@ async function main() {
             identifierOrCriteria: toBN(identifierOrCriteria),
             startAmount: toBN(startAmount),
             endAmount: toBN(endAmount),
-            recipient: offerer.address
+            recipient: offerer.address,
         },
     ];
 
-    const {order, orderHash, value} = await createOrder(
+    const { order, orderHash, value } = await createOrder(
         offerer,
         ZeroAddress,
         offer,
@@ -152,11 +149,9 @@ async function main() {
     console.log("offer:", order.parameters.offer);
     console.log("consideration:", order.parameters.consideration);
 
-    const tx = marketplace
-        .connect(fulfillerSigner)
-        .fulfillOrder(order, toKey(0), {
-            value,
-        });
+    const tx = marketplace.connect(fulfillerSigner).fulfillOrder(order, toKey(0), {
+        value,
+    });
 
     const receipt = await (await tx).wait();
 }
