@@ -49,16 +49,6 @@ async function main() {
     // approve WBOAs of seller to the Seaport
     await wboaToken.connect(nftBuyerSigner).approve(marketplace.address, tokenPriceAmount);
 
-    // update channel for seller and buyer
-    let status = await conduitController.getChannelStatus(conduitAddress, nftBuyer.address);
-    if (!status) {
-        await conduitController.updateChannel(conduitAddress, nftBuyer.address, true);
-    }
-    status = await conduitController.getChannelStatus(conduitAddress, nftSeller.address);
-    if (!status) {
-        await conduitController.updateChannel(conduitAddress, nftSeller.address, true);
-    }
-
     // Current status of seller, buyer, and nft
     let amount = await provider.getBalance(nftBuyer.address);
     console.log("NFT buyer(%s) balance:", nftBuyer.address, amount.toString());

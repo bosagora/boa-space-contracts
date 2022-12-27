@@ -17,19 +17,13 @@ import { IERC1155 } from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
  *         minted tokens are being spent from their creators' address, relying
  *         on the invariant that Seaport will never transfer tokens from an
  *         account that has not signed a valid order.
-
- SharedStorefrontLazymintAdapter는 ERC1155 토큰의 스텁으로, 기본 공유 스토어 프론트에서 토큰을 느리게 조폐하기 위한 안전한 프록시 역할을 합니다.
- 원래 공유 스토어 프론트의 느린 조폐 기능은 모든 사용자가 자신만의 와이번 스타일 프록시를 가질 것이라는 가정 하에 구축되었으며,
- 이는 시포트와 같은 글로벌 프록시와의 교환을 공유 프록시로 추가하는 것을 안전하지 않게 만든다.
- 이 어댑터 계약은 시포트가 유효한 주문에 서명하지 않은 계정에서 토큰을 전송하지 않을 것이라는 불변성에 의존하여 제작자의 주소에서 느슨하게 주조된 토큰이 지출되고 있는지 필요한 점검을 수행합니다.
-
  */
 contract SharedStorefrontLazyMintAdapter {
     IERC1155 immutable ssfToken;
     address private constant SEAPORT =
     0x4F445109d11419c3612e43D2e71a3593921621E0;
     address private constant CONDUIT =
-    0xCef34f700b0F060fAA00E91001259E80Fcdc9570;
+    0x65a14fDc9d62fc15454FE3ba1b59ABc59FF58A1b;
 
     error InsufficientBalance();
     error UnauthorizedCaller();

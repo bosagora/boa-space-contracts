@@ -7,7 +7,6 @@ import { ConduitControllerInterface } from "../typechain-types";
 import { expect } from "chai";
 
 async function main() {
-    const ConduitCreatorFactory = await ethers.getContractFactory("ConduitCreator");
     const ConduitControllerFactory = await ethers.getContractFactory("ConduitController");
 
     const provider = ethers.provider;
@@ -19,7 +18,7 @@ async function main() {
     const ownerConduitContorller = await conduitContorller.connect(adminSigner);
     const ownerConduitCreator = await conduitCreator.connect(adminSigner);
 
-    const conduitKeyOne = `${admin.address}000000000000000000000000`;
+    const conduitKeyOne = process.env.CONDUIT_KEY || "";
     await ownerConduitContorller.createConduit(conduitKeyOne, admin.address);
 
     console.log("Conduit for conduitKey:", conduitKeyOne, "created.");
