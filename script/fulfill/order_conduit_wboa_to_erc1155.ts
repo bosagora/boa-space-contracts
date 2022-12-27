@@ -44,7 +44,7 @@ async function main() {
     setSeaport(marketplace);
 
     const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
-    console.log("conduit address: %s for the conduit key: %s", conduitAddr, conduitKey);
+    console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);
