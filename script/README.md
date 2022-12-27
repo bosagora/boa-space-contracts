@@ -31,7 +31,6 @@ npx hardhat run script/deploy_conduit.ts --network testnet
 You get the result of deploying the contract.
 ```
 ConduitController - deployed to: 0x4d2335c88eb74ed54CEbA06Bb8DB69c4eab5feaD
-
 ```
 
 You should set the deployed address of the `ConduitContraoller` contract into the `CONDUIT_CONTROLLER_ADDRESS` constant in `.env` file.
@@ -40,29 +39,25 @@ CONDUIT_CONTROLLER_ADDRESS=0xFB15f7cB1E06544A791DbEd6AfdB9C705bF5eF60
 ```
 
 ## Creating Conduit
+**We don't use a default conduit on trading NFTs. So we don't need the conduit in fact but we can set the default conduit anyway.**
+
 We use a default conduit in the BosSpace, so we need to create the conduit which should be set to the `SharedStorefrontLazymintAdapter` contract.
+
+Before creating a default conduit, you should check the conduit key in the `.env` file as follows. Our default conduit key is always the same as the following value.
+```
+CONDUIT_KEY=0xdedF18e2fdf26Ec8f889EfE4ec84D7206bDC431E000000000000000000000000
+```
 
 Run this script for creating the default conduit.
 ```
 npx hardhat run script/create_conduit.ts --network testnet
 ```
 
-You get the result of creating the conduit.
-```
-Conduit for conduitKey: 0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7000000000000000000000000 created.
-Please chech the Conduit address `get_conduit.ts`.
-```
-
-Set the conduit key to the .env file.
-```
-CONDUIT_KEY=0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7000000000000000000000000
-```
-
 And just check the conduit address for the conduit key. 
 ```
 $ npx hardhat run script/get_conduit.ts --network testnet   
-Conduit address: 0x69e6535db62cE2ecf147Bf9F7B036D72bcC002AB
-conduitKey:  0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7000000000000000000000000
+Conduit address: 0x65a14fDc9d62fc15454FE3ba1b59ABc59FF58A1b
+conduitKey:  0xdedF18e2fdf26Ec8f889EfE4ec84D7206bDC431E000000000000000000000000
 ```
 
 ## Deploying Seaport contract
@@ -80,6 +75,10 @@ You should set the deployed address of the `Seaport` contract into the `SEAPORT_
 SEAPORT_ADDRESS=0xB38C5e7ecAe4a2E3B11E69AA98D9C5F087De8C90
 ```
 
+Run this script for adding the channel for the Seaport address to the the default conduit.
+```
+npx hardhat run script/update_conduit_channel.ts --network testnet
+```
 
 ## Deploying AssetContractShared contract
 Set the `name`, `symbol`, `templateURI` in the `.env` file which are the properties of the contract. The value of `templateURI` is optional.
