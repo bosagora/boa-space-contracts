@@ -13,10 +13,8 @@ async function main() {
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
 
-    const conduitCreator = await ConduitCreatorFactory.attach(process.env.CONDUIT_CREATOR_ADDRESS || "");
     const conduitContorller = await ConduitControllerFactory.attach(process.env.CONDUIT_CONTROLLER_ADDRESS || "");
     const ownerConduitContorller = await conduitContorller.connect(adminSigner);
-    const ownerConduitCreator = await conduitCreator.connect(adminSigner);
 
     const conduitKeyOne = process.env.CONDUIT_KEY || "";
     await ownerConduitContorller.createConduit(conduitKeyOne, admin.address);
