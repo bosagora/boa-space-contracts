@@ -1,4 +1,4 @@
-import { BigNumber} from "ethers";
+import { BigNumber } from "ethers";
 import { utils } from "ethers";
 
 export function parseTokenId(tokenId: string): [string, BigNumber, number] {
@@ -17,8 +17,7 @@ export function parseTokenId(tokenId: string): [string, BigNumber, number] {
     return [address, tokenIndex, maxSupply];
 }
 
-export function createTokenId(address: string, index: BigNumber, maxSupply: number)
-: BigNumber {
+export function createTokenId(address: string, index: BigNumber, maxSupply: number): BigNumber {
     let makerPart = BigNumber.from(utils.hexZeroPad(address, 32));
     makerPart = makerPart.shl(96); // shift 12 bytees
     const newIdPart = index.shl(40);

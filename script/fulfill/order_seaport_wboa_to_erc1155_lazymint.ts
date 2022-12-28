@@ -11,17 +11,24 @@ import { NonceManager } from "@ethersproject/experimental";
 import { BigNumber, BigNumberish, Wallet } from "ethers";
 import { ethers } from "hardhat";
 import { getItemETH, toBN, toKey } from "../../test/utils/encoding";
-import { Seaport, SharedStorefrontLazyMintAdapter} from "../../typechain-types";
+import { Seaport, SharedStorefrontLazyMintAdapter } from "../../typechain-types";
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import {
-    createOrder, depositToWBoa, depositToWboa,
-    depositToWBOA, displayBoaBalance, displayNFTBalance, displayWBoaBalance,
-    displayWBOABalance, setAssetContract,
+    createOrder,
+    depositToWBoa,
+    depositToWboa,
+    depositToWBOA,
+    displayBoaBalance,
+    displayNFTBalance,
+    displayWBoaBalance,
+    displayWBOABalance,
+    setAssetContract,
     setContracts,
-    setSeaport, setWBoaContract,
-    setWBOAContract
+    setSeaport,
+    setWBoaContract,
+    setWBOAContract,
 } from "../../utils/CommonFunctions";
-import type {ConsiderationItem, OfferItem} from "../../test/utils/types";
+import type { ConsiderationItem, OfferItem } from "../../test/utils/types";
 import { createTokenId } from "../../utils/ParseTokenID";
 
 const ZeroAddress = "0x0000000000000000000000000000000000000000";
@@ -36,7 +43,7 @@ async function main() {
     const admin = new Wallet(process.env.ADMIN_KEY || "");
     const adminSigner = new NonceManager(new GasPriceManager(provider.getSigner(admin.address)));
     const nftSeller = new Wallet(process.env.ORDER_NFT_SELLER_KEY || "");
-    const nftSellerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftSeller.address)))
+    const nftSellerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftSeller.address)));
     const nftBuyer = new Wallet(process.env.ORDER_NFT_BUYER_KEY || "");
     const nftBuyerSigner = new NonceManager(new GasPriceManager(provider.getSigner(nftBuyer.address)));
 
@@ -80,7 +87,7 @@ async function main() {
             identifierOrCriteria: toBN(0),
             startAmount: tokenPriceAmount,
             endAmount: tokenPriceAmount,
-        }
+        },
     ];
 
     // create considerations
@@ -93,7 +100,7 @@ async function main() {
             startAmount: toBN(nftAmount),
             endAmount: toBN(nftAmount),
             recipient: nftBuyer.address,
-        }
+        },
     ];
 
     // creator an order
@@ -102,8 +109,8 @@ async function main() {
         ZeroAddress,
         offer,
         consideration,
-        1, // PARTIAL_OPEN
-    )
+        1 // PARTIAL_OPEN
+    );
 
     console.log("orderHash:", orderHash);
     console.log("value:", value);
