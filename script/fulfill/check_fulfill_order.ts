@@ -33,17 +33,18 @@ async function main() {
 
     console.log("====== Asset Token");
     console.log("contract address:", assetToken.address);
-    console.log("NFT creator:", creator.address);
+    console.log("token ID\t:", tokenId.toString());
+    console.log("NFT creator\t:", creator.address);
     console.log("====== NFT seller");
-    console.log("address:", nftSeller.address);
+    console.log("address\t:", nftSeller.address);
     console.log("BOA\t:", (await provider.getBalance(nftSeller.address)).toString());
     console.log("WBOA\t:", (await wboaToken.getBalance(nftSeller.address)).toString());
-    console.log("Asset amount\t:", (await assetToken.balanceOf(nftSeller.address, tokenId)).toString());
+    console.log("NFT amount :", (await assetToken.balanceOf(nftSeller.address, tokenId)).toString());
     console.log("====== NFT buyer");
-    console.log("address:", nftBuyer.address);
+    console.log("address\t:", nftBuyer.address);
     console.log("BOA\t:", (await provider.getBalance(nftBuyer.address)).toString());
     console.log("WBOA\t:", (await wboaToken.getBalance(nftBuyer.address)).toString());
-    console.log("Asset amount\t:", (await assetToken.balanceOf(nftBuyer.address, tokenId)).toString());
+    console.log("NFT amount :", (await assetToken.balanceOf(nftBuyer.address, tokenId)).toString());
 }
 
 // We recommend this pattern to be able to use async/await everywhere

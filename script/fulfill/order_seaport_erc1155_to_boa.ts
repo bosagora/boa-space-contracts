@@ -36,18 +36,14 @@ async function main() {
     // TODO: Make utility functions creating offer and consideration
 
     // NFT seller creates an order that has an NFT token that he owns
-    const itemType: number = 3;
-    const token: string = storefront.address;
-    const identifierOrCriteria: BigNumberish = tokenId;
-    const startAmount: BigNumberish = BigNumber.from(1);
-    const endAmount: BigNumberish = BigNumber.from(1);
+    const nftAmount: BigNumberish = BigNumber.from(1);
     const offer: OfferItem[] = [
         {
-            itemType,
-            token,
-            identifierOrCriteria: toBN(identifierOrCriteria),
-            startAmount: toBN(startAmount),
-            endAmount: toBN(endAmount),
+            itemType: 3,
+            token: storefront.address,
+            identifierOrCriteria: toBN(tokenId),
+            startAmount: toBN(nftAmount),
+            endAmount: toBN(nftAmount),
         },
     ];
 

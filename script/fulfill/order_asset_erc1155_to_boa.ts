@@ -35,18 +35,14 @@ async function main() {
     console.log("SetApprovalForAll called");
 
     // NFT seller creates an order that has an NFT token that he owns
-    const itemType: number = 3;
-    const token: string = sharedAsset.address;
-    const identifierOrCriteria: BigNumberish = tokenId;
-    const startAmount: BigNumberish = BigNumber.from(1);
-    const endAmount: BigNumberish = BigNumber.from(1);
+    const nftAmount: BigNumberish = BigNumber.from(1);
     const offer: OfferItem[] = [
         {
-            itemType,
-            token,
-            identifierOrCriteria: toBN(identifierOrCriteria),
-            startAmount: toBN(startAmount),
-            endAmount: toBN(endAmount),
+            itemType: 3,
+            token: sharedAsset.address,
+            identifierOrCriteria: toBN(tokenId),
+            startAmount: toBN(nftAmount),
+            endAmount: toBN(nftAmount),
         },
     ];
 
@@ -61,11 +57,11 @@ async function main() {
         0 // FULL_OPEN
     );
 
+    console.log("orderHash:", orderHash);
+    console.log("value:", value);
     console.log("order:", order);
     console.log("offer:", order.parameters.offer);
     console.log("consideration:", order.parameters.consideration);
-    console.log("orderHash:", orderHash);
-    console.log("value:", value);
 
     const tx = marketplaceContract.connect(nftBuyerSigner).fulfillOrder(order, toKey(0), {
         value,

@@ -8,10 +8,10 @@ import { ConduitController, Consideration, Seaport, SharedStorefrontLazyMintAdap
 import { GasPriceManager } from "../../utils/GasPriceManager";
 import {
     checkExpectedEvents,
-    createOrder,
+    createOrder, depositToWBoa, displayBoaBalance, displayNFTBalance, displayWBoaBalance, setAssetContract,
     setChainId,
     setContracts,
-    setSeaport,
+    setSeaport, setWBoaContract,
     withBalanceChecks,
 } from "../../utils/CommonFunctions";
 import type { ConsiderationItem, OfferItem } from "../../test/utils/types";
@@ -42,6 +42,8 @@ async function main() {
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
 
     setSeaport(marketplace);
+    setWBoaContract(wboaToken);
+    setAssetContract(assetToken);
 
     const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
     console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);
@@ -60,72 +62,43 @@ async function main() {
         await conduitController.connect(adminSigner).updateChannel(conduitAddress, marketplace.address, true);
     }
 
-    const nftAmount = await assetToken.balanceOf(nftSeller.address, tokenId);
-    console.log("NFT balance of the seller", nftSeller.address, ":", nftAmount.toString());
-
     // The needed amount of WBOA for trading
     const tokenPriceAmount = ethers.utils.parseEther("0.1");
-    const spareAmount = ethers.utils.parseEther("1.0");
 
     // Current status of seller, buyer, and nft
-    let amount = await provider.getBalance(nftBuyer.address);
-    console.log("NFT buyer(%s) balance:", nftBuyer.address, amount.toString());
-    amount = await provider.getBalance(nftSeller.address);
-    console.log("NFT seller(%s) balance:", nftSeller.address, amount.toString());
-    console.log("====== Minted NFT information ======");
-    console.log("tokenId:", tokenId.toHexString());
-    console.log("creator:", await assetToken.creator(tokenId));
-    console.log("NFT balance of seller:", await assetToken.balanceOf(nftSeller.address, tokenId));
+    await displayNFTBalance("Seller", tokenId, nftSeller.address);
+    await displayBoaBalance("Buyer", nftBuyer.address);
+    await displayBoaBalance("Seller", nftSeller.address);
 
     // deposit BOA to WBOA contract from NFT buyer
-    amount = await wboaToken.getBalance(nftBuyer.address);
-    if (amount <= tokenPriceAmount.add(spareAmount)) {
-        await wboaToken.connect(nftBuyerSigner).deposit({ value: tokenPriceAmount.add(spareAmount) });
-    }
-
-    // deposit BOA to WBOA contract from NFT seller
-    amount = await wboaToken.getBalance(nftSeller.address);
-    if (amount <= spareAmount) {
-        await wboaToken.connect(nftSellerSigner).deposit({ value: spareAmount });
-    }
-
-    amount = await wboaToken.getBalance(nftBuyer.address);
-    console.log("buyer's WBOA:", amount.toString());
-    amount = await wboaToken.getBalance(nftSeller.address);
-    console.log("seller's WBOA:", amount.toString());
+    const totalDeposit = ethers.utils.parseEther("1.0");
+    await depositToWBoa(nftBuyer.address, totalDeposit);
+    await displayWBoaBalance("Buyer", nftBuyer.address);
+    await displayWBoaBalance("Seller", nftSeller.address);
 
     // TODO: Make utility functions creating offer and consideration
 
     // Creating an offer which is the ERC20 tokens
-    const offerItemType: number = 1;
-    const offerToken: string = wboaToken.address;
-    const offerIdentifierOrCriteria: BigNumberish = 0;
-    const offerStartAmount: BigNumberish = tokenPriceAmount;
-    const offerEndAmount: BigNumberish = tokenPriceAmount;
     const offer: OfferItem[] = [
         {
-            itemType: offerItemType,
-            token: offerToken,
-            identifierOrCriteria: toBN(offerIdentifierOrCriteria),
-            startAmount: toBN(offerStartAmount),
-            endAmount: toBN(offerEndAmount),
+            itemType: 1,
+            token: wboaToken.address,
+            identifierOrCriteria: toBN(0),
+            startAmount: toBN(tokenPriceAmount),
+            endAmount: toBN(tokenPriceAmount),
         },
     ];
 
     // Creating the first consideration which is goes to the NFT buyer
     // TODO: Add consideration going to the Proxy
-    const itemType: number = 3;
-    const token: string = storefront.address;
-    const identifierOrCriteria: BigNumberish = tokenId;
-    const startAmount: BigNumberish = BigNumber.from(1);
-    const endAmount: BigNumberish = BigNumber.from(1);
+    const nftAmount: BigNumberish = BigNumber.from(1);
     const consideration: ConsiderationItem[] = [
         {
-            itemType,
-            token,
-            identifierOrCriteria: toBN(identifierOrCriteria),
-            startAmount: toBN(startAmount),
-            endAmount: toBN(endAmount),
+            itemType: 3,
+            token: storefront.address,
+            identifierOrCriteria: toBN(tokenId),
+            startAmount: toBN(nftAmount),
+            endAmount: toBN(nftAmount),
             recipient: nftBuyer.address,
         },
     ];
@@ -143,6 +116,8 @@ async function main() {
         conduitKey
     );
 
+    console.log("orderHash:", orderHash);
+    console.log("value:", value);
     console.log("order:", order);
     console.log("offer:", order.parameters.offer);
     console.log("consideration:", order.parameters.consideration);
@@ -151,7 +126,7 @@ async function main() {
         value,
     });
 
-    const receipt = await (await tx).wait();
+    await (await tx).wait();
 }
 
 // We recommend this pattern to be able to use async/await everywhere

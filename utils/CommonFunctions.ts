@@ -13,17 +13,23 @@ import {
 import { VERSION } from "../test/utils/helpers";
 import { AdvancedOrder, ConsiderationItem, CriteriaResolver, OrderComponents } from "../test/utils/types";
 import {
+  AssetContractShared,
   BoaTestERC1155,
   Seaport,
-  TestZone
+  TestZone,
+  WBOA9
 } from "../typechain-types";
 import type { OfferItem } from "../test/utils/types";
+import {NonceManager} from "@ethersproject/experimental";
+import {GasPriceManager} from "./GasPriceManager";
 const { orderType } = require("../eip-712-types/order");
 const { parseEther, keccak256 } = ethers.utils;
 
 const provider = ethers.provider;
 let marketplaceContract: Seaport;
+let assetToken: AssetContractShared;
 let testERC1155: BoaTestERC1155;
+let wboaToken:WBOA9;
 
 export const setContracts = (seaportContrct: Seaport, erc1155Contract: BoaTestERC1155
 ) => {
@@ -35,11 +41,56 @@ export const setSeaport = (seaportContrct: Seaport) => {
   marketplaceContract = seaportContrct;
 }
 
+export const setWBoaContract = (_wboaContrct: WBOA9) => {
+  wboaToken = _wboaContrct;
+}
+
+export const setAssetContract = (_assetContrct: AssetContractShared) => {
+  assetToken = _assetContrct;
+}
+
 // Default chainId is for the Bosagora testnet
 let chainId: number = 2019;
 
 export const setChainId = async (_chainId: number) => {
   chainId = _chainId;
+}
+
+export const depositToWBoa = async (depositer: string, totalDeposit: BigNumber) => {
+  const depositSigner = new NonceManager(new GasPriceManager(provider.getSigner(depositer)));
+
+  let amount = await wboaToken.getBalance(depositer);
+
+  if (totalDeposit.gt(amount)) {
+    await wboaToken.connect(depositSigner).deposit({ value: totalDeposit.sub(amount) });
+  }
+}
+
+export const displayBoaBalance = async (msg: string, owner: string) => {
+  const amount = await provider.getBalance(owner);
+  const intPartStr = amount.div(BigNumber.from(10.0).pow(18)).toString();
+  if (intPartStr === "0") {
+    console.log("%s BOA balance: 0.%s", msg, amount.toString().padStart(18, "0"));
+  }
+  else {
+    console.log("%s BOA balance: %s.%s", msg, intPartStr, amount.toString().slice(intPartStr.length));
+  }
+}
+
+export const displayNFTBalance = async (msg: string, tokenId: BigNumber, owner: string) => {
+  console.log("NFT tokenId:", tokenId.toString());
+  console.log("%s NFT balance: %s", msg, await assetToken.balanceOf(owner, tokenId));
+}
+
+export const displayWBoaBalance = async (msg: string, owner: string) => {
+  const amount = await wboaToken.getBalance(owner);
+  const intPartStr = amount.div(BigNumber.from(10.0).pow(18)).toString();
+  if (intPartStr === "0") {
+    console.log("%s WBOA balance: 0.%s", msg, amount.toString().padStart(18, "0"));
+  }
+  else {
+    console.log("%s WBOA balance: %s.%s", msg, intPartStr, amount.toString().slice(intPartStr.length));
+  }
 }
 
 export const withBalanceChecks = async (
