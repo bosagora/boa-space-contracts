@@ -10,12 +10,13 @@
   - [Check the information on the minted NFT token](#check-the-information-on-the-minted-nft-token)
 - [Transfer of AssetContractShared Tokens with Seaport](#transfer-of-assetcontractshared-tokens-with-seaport)
   - [Prerequisites](#prerequisites)
-  - [Fulfill through the Seaport and SharedStorefrontLazyMintAdapter](#fulfill-through-the-seaport-and-sharedstorefrontlazymintadapter)
+  - [Fulfill through the Seaport and SharedStorefrontLazyMintAdapter without Conduit](#fulfill-through-the-seaport-and-sharedstorefrontlazymintadapter-without-conduit)
     - [Offer NFT and receive BOA as consideration](#offer-nft-and-receive-boa-as-consideration)
     - [Offer WBOA and receive NFT as consideration](#offer-wboa-and-receive-nft-as-consideration)
-  - [Fulfill through the Seaport, Conduit, and SharedStorefrontLazyMintAdapter](#fulfill-through-the-seaport-conduit-and-sharedstorefrontlazymintadapter)
-    - [Offer WBOA and receive NFT as consideration](#offer-wboa-and-receive-nft-as-consideration-1)
     - [Offer WBOA and receive NFT that is lazily minted as consideration](#offer-wboa-and-receive-nft-that-is-lazily-minted-as-consideration)
+  - [Fulfill through the Seaport, Conduit, and SharedStorefrontLazyMintAdapter](#fulfill-through-the-seaport-conduit-and-sharedstorefrontlazymintadapter)
+    - [Offer WBOA and receive NFT as consideration](#offer-wboa-and-receive-nft-as-consideration)
+    - [Offer WBOA and receive NFT that is lazily minted as consideration](#offer-wboa-and-receive-nft-that-is-lazily-minted-as-consideration-1)
   - [Fulfill only through the Seaport](#fulfill-only-through-the-seaport)
 
 All the description is for the [Bosagora TestNet](https://testnet.boascan.io).
@@ -242,7 +243,7 @@ We summarize the addresses for the contracts that are used frequently in this do
 0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd: AssetContractShared 
 ```
 
-## Fulfill through the Seaport and SharedStorefrontLazyMintAdapter
+## Fulfill through the Seaport and SharedStorefrontLazyMintAdapter without Conduit
 ### Offer NFT and receive BOA as consideration
 This describes the steps for fulfilling an order that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through `Seaport` and `SharedStorefrontLazyMintAdapter` contracts.
 
@@ -372,9 +373,74 @@ You should check the result of fulfilling an order with the `check_fulfill_order
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
 ```
 
+### Offer WBOA and receive NFT that is lazily minted as consideration
+This describes fulfilling an order **without any conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having `NFT` tokens that are going to be lazily minted.
+
+Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-and-mint-an-nft-token).
+
+You should check the balances of the offerer and fulfiller with this command.
+```
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
+```
+And run this command for fulfilling an order.
+```
+npx hardhat run script/fulfill/order_seaport_wboa_to_erc1155_lazymint.ts --network testnet
+```
+The details of the order are as follows.
+```
+order: {
+  parameters: {
+    offerer: '0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53',
+    zone: '0x0000000000000000000000000000000000000000',
+    offer: [ [Object] ],
+    consideration: [ [Object] ],
+    totalOriginalConsiderationItems: 1,
+    orderType: 1,
+    zoneHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    salt: '0xe1ea5147e95f8f98887220b3aedf7940b7524d4f20aefe03b6bdc3c2e7396a31',
+    conduitKey: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    startTime: 0,
+    endTime: BigNumber { value: "5172014448931175958106549077934080" }
+  },
+  signature: '0x45e85622f37be9d0703cee52225ecefb41acae873ef2df295b386393a5d9e5236eb0c204f333daa769ccd22822ed120888c84d59a8cb87d43e3f8efe69cb011f1b',
+  numerator: 1,
+  denominator: 1,
+  extraData: '0x'
+}
+```
+```
+offer: [
+  {
+    itemType: 1,
+    token: '0x7700a9Bc2c4a523EFFd6B506b6f78872F247161C',
+    identifierOrCriteria: BigNumber { value: "0" },
+    startAmount: BigNumber { value: "100000000000000000" },
+    endAmount: BigNumber { value: "100000000000000000" }
+  }
+]
+```
+
+```
+consideration: [
+  {
+    itemType: 3,
+    token: '0x790c4c73155F89F93ad18e3b3B483B688E867c4b',
+    identifierOrCriteria: BigNumber { value: "29534064577826613153035026441167017977610697301918714276122832834548497121480" },
+    startAmount: BigNumber { value: "10" },
+    endAmount: BigNumber { value: "10" },
+    recipient: '0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53'
+  }
+]
+```
+
+You should check the result of fulfilling an order with the `check_fulfill_order.ts` script as you had check the balances of the offerer and fulfiller before fulfilling the order.
+```
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
+```
+
 ## Fulfill through the Seaport, Conduit, and SharedStorefrontLazyMintAdapter
 ### Offer WBOA and receive NFT as consideration
-This describes fulfilling an order through a default conduit which consists of an offer having an 0.1 `WBOA` and a consideration having an `NFT` token.
+This describes fulfilling an order **through a default conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having an `NFT` token.
 
 You should check the balances of the offerer and fulfiller with this command.
 ```
@@ -438,7 +504,7 @@ npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 
 
 ### Offer WBOA and receive NFT that is lazily minted as consideration
-This describes fulfilling an order through a default conduit which consists of an offer having an 0.1 `WBOA` and a consideration having `NFT` tokens that are going to be lazily minted.
+This describes fulfilling an order **through a default conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having `NFT` tokens that are going to be lazily minted.
 
 Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-and-mint-an-nft-token).
 
