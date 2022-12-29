@@ -143,6 +143,9 @@ npx hardhat run script/finpl/add_shared_proxy.ts --network testnet
 ```
 
 ## Set information and mint an NFT token
+
+### Set information for minting
+
 You should mint an NFT token before trading. This is a description of how to mint an NFT token. You could mint FINPL tokens also with these commands.
 
 Set the information of the NFT in `.env` file that you want to mint.
@@ -153,6 +156,7 @@ FINPL_NFT_DATA=https://ipfs.io/ipfs/QmXdYWxw3di8Uys9fmWTmdariUoUgBCsdVfHtseL2dtE
 FINPL_NFT_CREATOR_KEY=bacfa3fbe768c1665feee09af7182ae53ca9a334db747b3751149f81e448ac26
 ```
 
+### Mint new NFT tokens
 Run this script to mint an NFT.
 ```
 npx hardhat run script/finpl/mint.ts --network testnet'
@@ -275,7 +279,6 @@ order: {
     denominator: 1,
     extraData: '0x'
 }
-
 ```
 ```
 offer: [
@@ -287,7 +290,6 @@ offer: [
     endAmount: BigNumber { value: "1" }
 }
 ]
-
 ```
 ```
 consideration: [
@@ -300,7 +302,6 @@ consideration: [
     recipient: '0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53'
 }
 ]
-
 ```
 
 You should check the result of fulfilling an order with the `check_fulfill_order.ts` script as you had checked the balances of the offerer and buyer before fulfilling the order.
@@ -340,7 +341,6 @@ order: {
     denominator: 1,
     extraData: '0x'
 }
-
 ```
 ```
 offer: [
@@ -375,7 +375,7 @@ npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ### Offer WBOA and receive NFT that is lazily minted as consideration
 This describes fulfilling an order **without any conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having `NFT` tokens that are going to be lazily minted.
 
-Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-and-mint-an-nft-token).
+Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-for-minting).
 
 You should check the balances of the offerer and fulfiller with this command.
 ```
@@ -435,6 +435,70 @@ consideration: [
 You should check the result of fulfilling an order with the `check_fulfill_order.ts` script as you had check the balances of the offerer and fulfiller before fulfilling the order.
 ```
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
+```
+
+### Offer NFT that is lazily minted and receive BOA as consideration
+This describes the steps for fulfilling an order **without any conduit** that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through `Seaport` and `SharedStorefrontLazyMintAdapter` contracts.
+
+Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-for-minting).
+
+You should check the balances of the offerer and fulfiller with this command before fulfilling an order.
+```
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
+```
+And run this command for fulfilling an order.
+```
+npx hardhat run script/fulfill/order_seaport_erc1155_to_boa_lazymint.ts --network testnet
+```
+The details of the order are as follows.
+```
+order: {
+  parameters: {
+    offerer: '0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7',
+    zone: '0x0000000000000000000000000000000000000000',
+    offer: [ [Object] ],
+    consideration: [ [Object] ],
+    totalOriginalConsiderationItems: 1,
+    orderType: 0,
+    zoneHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    salt: '0x7055472912195a36c3fc4e4e3faeeec05d8b42f9bc2e45c4ee5d2af8d7315ac8',
+    conduitKey: '0x0000000000000000000000000000000000000000000000000000000000000000',
+    startTime: 0,
+    endTime: BigNumber { value: "5172014448931175958106549077934080" }
+  },
+  signature: '0xd7b3ab659dbd3410358a5c083b39649785a223d0f05867a69243a3598d456804070ac60b05a1ea506718b820b0a6bfd31b18cf7903af3a7dea737bcaf1a43a2c1c',
+  numerator: 1,
+  denominator: 1,
+  extraData: '0x'
+}
+```
+```
+offer: [
+  {
+    itemType: 3,
+    token: '0x790c4c73155F89F93ad18e3b3B483B688E867c4b',
+    identifierOrCriteria: BigNumber { value: "29534064577826613153035026441167017977610697301918714276122833929662078386376" },
+    startAmount: BigNumber { value: "5" },
+    endAmount: BigNumber { value: "5" }
+  }
+]
+```
+```
+consideration: [
+  {
+    itemType: 0,
+    token: '0x0000000000000000000000000000000000000000',
+    identifierOrCriteria: BigNumber { value: "0" },
+    startAmount: BigNumber { value: "100000000000000000" },
+    endAmount: BigNumber { value: "100000000000000000" },
+    recipient: '0x414BB02bDe65Ba63c9A99709b388E30669Bf2De7'
+  }
+]
+```
+
+You should check the result of fulfilling an order with the `check_fulfill_order.ts` script as you had checked the balances of the offerer and buyer before fulfilling the order.
+```
+npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 
 ## Fulfill through the Seaport, Conduit, and SharedStorefrontLazyMintAdapter
