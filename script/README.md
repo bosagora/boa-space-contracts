@@ -1,13 +1,16 @@
 # Contents
+- [Install node modules](#install-node-modules)
 - [Deployment of contracts](#deployment-of-contracts)
   - [Deploying ConduitController contract](#deploying-conduitcontraoller-contract)
   - [Creating Conduit](#creating-conduit)
   - [Deploying Seaport contract](#deploying-seaport-contract)
   - [Deploying AssetContractShared contract](#deploying-assetcontractshared-contract)
   - [Deploying SharedStorefrontLazymintAdapter contract](#deploying-sharedstorefrontlazymintadapter-contract)
-- [Minting an AssetContract NFT](#minting-an-assetcontractshared-nft)
-  - [Set information and mint an NFT token](#set-information-and-mint-an-nft-token)
+- [Minting AssetContractShared NFT Tokens](#minting-assetcontractshared-nft-tokens)
+  - [Set information for minting](#set-information-for-minting)
+  - [Mint new NFT tokens](#mint-new-nft-tokens)
   - [Check the information on the minted NFT token](#check-the-information-on-the-minted-nft-token)
+  - [Setting the shared proxy of AssetContractShared](#setting-the-shared-proxy-of-assetcontractshared)
 - [Transfer of AssetContractShared Tokens with Seaport](#transfer-of-assetcontractshared-tokens-with-seaport)
   - [Prerequisites](#prerequisites)
   - [Fulfill through the Seaport and SharedStorefrontLazyMintAdapter without Conduit](#fulfill-through-the-seaport-and-sharedstorefrontlazymintadapter-without-conduit)
@@ -21,10 +24,16 @@
 
 All the description is for the [Bosagora TestNet](https://testnet.boascan.io).
 
+# Install node modules
+You should install node modules before running scripts and test codes
+```
+yarn install
+```
+
 # Deployment of contracts
 You should follow the order of deploying the contracts because one contract should be deployed before another contract like the `ConduitController` should be earlier deployed to deploy the `Seaport` by passing the address of the `ConduitController` in the constructor.
 
-## Deploying ConduitContraoller contract
+### Deploying ConduitContraoller contract
 Run this script for deploying the contract.
 ```
 npx hardhat run script/deploy_conduit.ts --network testnet
@@ -39,7 +48,7 @@ You should set the deployed address of the `ConduitContraoller` contract into th
 CONDUIT_CONTROLLER_ADDRESS=0xFB15f7cB1E06544A791DbEd6AfdB9C705bF5eF60
 ```
 
-## Creating Conduit
+### Creating Conduit
 **We don't use a default conduit on trading NFTs. So we don't need the conduit in fact but we can set the default conduit anyway.**
 
 We use a default conduit in the BosSpace, so we need to create the conduit which should be set to the `SharedStorefrontLazymintAdapter` contract.
@@ -61,7 +70,7 @@ Conduit address: 0x65a14fDc9d62fc15454FE3ba1b59ABc59FF58A1b
 conduitKey:  0xdedF18e2fdf26Ec8f889EfE4ec84D7206bDC431E000000000000000000000000
 ```
 
-## Deploying Seaport contract
+### Deploying Seaport contract
 Run this script for deploying the contract.
 ```
 npx hardhat run script/deploy_seaport.ts --network testnet
@@ -81,7 +90,7 @@ Run this script for adding the channel for the Seaport address to the the defaul
 npx hardhat run script/update_conduit_channel.ts --network testnet
 ```
 
-## Deploying AssetContractShared contract
+### Deploying AssetContractShared contract
 Set the `name`, `symbol`, `templateURI` in the `.env` file which are the properties of the contract. The value of `templateURI` is optional.
 ```
 # Parameters of AssetContractShared constructor
@@ -112,7 +121,7 @@ symbol: BOASTORE
 templateURI: 
 ```
 
-## Deploying SharedStorefrontLazyMintAdapter contract
+### Deploying SharedStorefrontLazyMintAdapter contract
 Before this contract, we should set the following hardcoded state variables in the `SharedStorefrontLazyMintAdapter.sol`.
 ```solidity
 address private constant SEAPORT = 0x4F445109d11419c3612e43D2e71a3593921621E0;
@@ -135,14 +144,7 @@ You should set the deployed address of the `SharedStorefrontLazymintAdapter` con
 LAZY_MINT_ADAPTER_ADDRESS=0xE11FDE48B267C0d4c56e38E7c7868aE5aE2C59Dd
 ```
 
-# Minting an AssetContractShared NFT
-## Setting the shared proxy of AssetContractShared
-The deployer that is represented as `ADMIN_KEY` in .env file should get the role of the shared proxy for some scripts like `transfer_batch.ts` and `transfer_buyer.ts`. So you should run this script before transferring `AssetContractShared` NFT tokens. 
-```
-npx hardhat run script/finpl/add_shared_proxy.ts --network testnet
-```
-
-## Set information and mint an NFT token
+# Minting AssetContractShared NFT Tokens
 
 ### Set information for minting
 
@@ -168,8 +170,7 @@ Combined tokenId: 78124813713363012903054561010911293954183699126175542122344455
 Token minted to: 0xAcb913db781a46611fAa04Ff6Cb9A370df069eed
 ```
 
-
-## Check the information on the minted NFT token
+### Check the information on the minted NFT token
 Set the token ID to the `.env` file that you have minted.
 ```
 FINPL_NFT_LAST_COMBINE_TOKEN_ID=0xacb913db781a46611faa04ff6cb9a370df069eed0000000000005e0000000064
@@ -192,6 +193,12 @@ max supply: 100
 balance of creator: 100
 ```
 
+### Setting the shared proxy of AssetContractShared
+The deployer that is represented as `ADMIN_KEY` in .env file should get the role of the shared proxy for some scripts like `transfer_batch.ts` and `transfer_buyer.ts`. So you should run this script before transferring `AssetContractShared` NFT tokens. 
+```
+npx hardhat run script/finpl/add_shared_proxy.ts --network testnet
+```
+
 # Transfer of AssetContractShared Tokens with Seaport
 There are three ways of fulfilling an order for trading `AssetContractShared` tokens.
 1. Fulfill an order through the `Seaport` and `SharedStorefrontLazyMintAdapter` contracts.
@@ -202,7 +209,7 @@ We describe how to use scripts to fulfill an order and check it in three ways.
 
 This description is the steps for trading NFTs in [TestNet](https://testnet.boascan.io).
 
-## Prerequisites
+### Prerequisites
 You should set the token ID which you want to trade in the following commands.
 ```
 FINPL_NFT_LAST_COMBINE_TOKEN_ID=29534064577826613153035026441167017977610697301918714276122831730638822834376
@@ -246,8 +253,8 @@ We summarize the addresses for the contracts that are used frequently in this do
 0x2fddd0f488B767E8Dd42aE4E60f0685A2e15b1Fd: AssetContractShared 
 ```
 
-## Fulfill through the Seaport and SharedStorefrontLazyMintAdapter without Conduit
-### Offer NFT and receive BOA as consideration
+### Fulfill through the Seaport and SharedStorefrontLazyMintAdapter without Conduit
+#### Offer NFT and receive BOA as consideration
 This describes the steps for fulfilling an order that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through `Seaport` and `SharedStorefrontLazyMintAdapter` contracts.
 
 You should check the balances of the offerer and fulfiller with this command before fulfilling an order.
@@ -309,7 +316,7 @@ You should check the result of fulfilling an order with the `check_fulfill_order
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 
-### Offer WBOA and receive NFT as consideration
+#### Offer WBOA and receive NFT as consideration
 This describes fulfilling an order that consists of an offer having an 0.1 `WBOA` and a consideration having an `NFT` token.
 
 You should check the balances of the offerer and fulfiller with this command.
@@ -372,7 +379,7 @@ You should check the result of fulfilling an order with the `check_fulfill_order
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
 ```
 
-### Offer WBOA and receive NFT that is lazily minted as consideration
+#### Offer WBOA and receive NFT that is lazily minted as consideration
 This describes fulfilling an order **without any conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having `NFT` tokens that are going to be lazily minted.
 
 Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-for-minting).
@@ -437,7 +444,7 @@ You should check the result of fulfilling an order with the `check_fulfill_order
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
 ```
 
-### Offer NFT that is lazily minted and receive BOA as consideration
+#### Offer NFT that is lazily minted and receive BOA as consideration
 This describes the steps for fulfilling an order **without any conduit** that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through `Seaport` and `SharedStorefrontLazyMintAdapter` contracts.
 
 Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-for-minting).
@@ -501,8 +508,8 @@ You should check the result of fulfilling an order with the `check_fulfill_order
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 
-## Fulfill through the Seaport, Conduit, and SharedStorefrontLazyMintAdapter
-### Offer WBOA and receive NFT as consideration
+### Fulfill through the Seaport, Conduit, and SharedStorefrontLazyMintAdapter
+#### Offer WBOA and receive NFT as consideration
 This describes fulfilling an order **through a default conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having an `NFT` token.
 
 You should check the balances of the offerer and fulfiller with this command.
@@ -566,7 +573,7 @@ npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet
 ```
 
 
-### Offer WBOA and receive NFT that is lazily minted as consideration
+#### Offer WBOA and receive NFT that is lazily minted as consideration
 This describes fulfilling an order **through a default conduit** which consists of an offer having an 0.1 `WBOA` and a consideration having `NFT` tokens that are going to be lazily minted.
 
 Before we get started, we should set the information for lazily minted tokens in the `.env` file as described in [this section](#set-information-and-mint-an-nft-token).
@@ -631,7 +638,7 @@ You should check the result of fulfilling an order with the `check_fulfill_order
 npx hardhat run script/fulfill/check_fulfill_order.ts --network testnet 
 ```
 
-## Fulfill only through the Seaport
+### Fulfill only through the Seaport
 This describes the steps for fulfilling an order that consists of an offer having an `AssetContractShard` NFT and a consideration having 0.1 `BOA` through the `Seaport` contract without `SharedStorefrontLazyMintAdapter` or `Conduit` contracts.
 ```
 npx hardhat run script/fulfill/order_asset_erc1155_to_boa.ts --network testnet
