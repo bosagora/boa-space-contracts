@@ -47,9 +47,7 @@ async function main() {
     const wboaToken = await WBOAFactory.attach(process.env.WBOA_ADDRESS);
     const tokenId = BigNumber.from(process.env.FINPL_NFT_LAST_COMBINE_TOKEN_ID || "");
 
-    setSeaport(marketplace);
-    setWBoaContract(wboaToken);
-    setAssetContract(assetToken);
+    setContracts(marketplace, assetToken, wboaToken);
 
     const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
     console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);

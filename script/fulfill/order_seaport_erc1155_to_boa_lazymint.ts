@@ -45,8 +45,7 @@ async function main() {
     const data = process.env.FINPL_NFT_DATA || "";
     const newTokenId = createTokenId(nftSeller.address, tokenIndex, quantity);
 
-    setSeaport(marketplace);
-    setAssetContract(assetToken);
+    setContracts(marketplace, assetToken);
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);
@@ -59,7 +58,7 @@ async function main() {
     // TODO: Make utility functions creating offer and consideration
 
     // NFT seller creates an order that has an NFT token that he owns
-    const nftAmount: BigNumberish = BigNumber.from(5);
+    const nftAmount: BigNumberish = BigNumber.from(1);
     const offer: OfferItem[] = [
         {
             itemType: 3,

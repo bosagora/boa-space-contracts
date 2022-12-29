@@ -49,9 +49,7 @@ async function main() {
     const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
     console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);
 
-    setSeaport(marketplace);
-    setWBoaContract(wboaToken);
-    setAssetContract(assetToken);
+    setContracts(marketplace, assetToken, wboaToken);
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);

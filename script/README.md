@@ -425,8 +425,8 @@ consideration: [
     itemType: 3,
     token: '0x790c4c73155F89F93ad18e3b3B483B688E867c4b',
     identifierOrCriteria: BigNumber { value: "29534064577826613153035026441167017977610697301918714276122832834548497121480" },
-    startAmount: BigNumber { value: "10" },
-    endAmount: BigNumber { value: "10" },
+    startAmount: BigNumber { value: "1" },
+    endAmount: BigNumber { value: "1" },
     recipient: '0x214a3aE4f8A245197db523fb81Dd8aD93c1c7B53'
   }
 ]
@@ -478,8 +478,8 @@ offer: [
     itemType: 3,
     token: '0x790c4c73155F89F93ad18e3b3B483B688E867c4b',
     identifierOrCriteria: BigNumber { value: "29534064577826613153035026441167017977610697301918714276122833929662078386376" },
-    startAmount: BigNumber { value: "5" },
-    endAmount: BigNumber { value: "5" }
+    startAmount: BigNumber { value: "1" },
+    endAmount: BigNumber { value: "1" }
   }
 ]
 ```

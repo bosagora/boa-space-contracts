@@ -20,7 +20,7 @@ import {
     displayNFTBalance,
     displayWBoaBalance,
     setAssetContract,
-    setChainId,
+    setChainId, setContracts,
     setSeaport,
     setWBoaContract,
 } from "../../utils/CommonFunctions";
@@ -57,9 +57,7 @@ async function main() {
     const data = process.env.FINPL_NFT_DATA || "";
     const newTokenId = createTokenId(nftSeller.address, tokenIndex, quantity);
 
-    setSeaport(marketplace);
-    setWBoaContract(wboaToken);
-    setAssetContract(assetToken);
+    setContracts(marketplace, assetToken, wboaToken);
 
     const { conduit: conduitAddress, exists } = await conduitController.getConduit(conduitKey);
     console.log("conduit address: %s for the conduit key: %s", conduitAddress, conduitKey);
@@ -105,7 +103,7 @@ async function main() {
     ];
 
     // Creating the first consideration which is goes to the creator
-    const nftAmount: BigNumberish = BigNumber.from(10);
+    const nftAmount: BigNumberish = BigNumber.from(1);
     const consideration: ConsiderationItem[] = [
         {
             itemType: 3,

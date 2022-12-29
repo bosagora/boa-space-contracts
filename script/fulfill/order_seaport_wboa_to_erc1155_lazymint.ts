@@ -57,9 +57,7 @@ async function main() {
     const data = process.env.FINPL_NFT_DATA || "";
     const newTokenId = createTokenId(nftSeller.address, tokenIndex, quantity);
 
-    setSeaport(marketplace);
-    setWBoaContract(wboaToken);
-    setAssetContract(assetToken);
+    setContracts(marketplace, assetToken, wboaToken);
 
     // set the shared proxy of assetToken to SharedStorefront
     await assetToken.connect(adminSigner).addSharedProxyAddress(storefront.address);
@@ -91,7 +89,7 @@ async function main() {
     ];
 
     // create considerations
-    const nftAmount: BigNumberish = BigNumber.from(10);
+    const nftAmount: BigNumberish = BigNumber.from(1);
     const consideration: ConsiderationItem[] = [
         {
             itemType: 3,

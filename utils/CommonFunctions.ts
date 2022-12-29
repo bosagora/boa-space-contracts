@@ -1,7 +1,9 @@
+import { NonceManager } from "@ethersproject/experimental";
 import { expect } from "chai";
-import { BigNumber, BigNumberish, constants, Contract, ContractReceipt, ContractTransaction, Wallet } from "ethers";
+import { BigNumber, Contract, constants } from "ethers";
 import { recoverAddress } from "ethers/lib/utils";
 import { ethers } from "hardhat";
+
 import {
     calculateOrderHash,
     convertSignatureToEIP2098,
@@ -11,23 +13,37 @@ import {
     toKey,
 } from "../test/utils/encoding";
 import { VERSION } from "../test/utils/helpers";
-import { AdvancedOrder, ConsiderationItem, CriteriaResolver, OrderComponents } from "../test/utils/types";
-import { AssetContractShared, BoaTestERC1155, Seaport, TestZone, WBOA9 } from "../typechain-types";
-import type { OfferItem } from "../test/utils/types";
-import { NonceManager } from "@ethersproject/experimental";
+
 import { GasPriceManager } from "./GasPriceManager";
+
+import type {
+    AdvancedOrder,
+    ConsiderationItem,
+    CriteriaResolver,
+    OfferItem,
+    OrderComponents,
+} from "../test/utils/types";
+import type { AssetContractShared, Seaport, TestZone, WBOA9 } from "../typechain-types";
+import type { BigNumberish, ContractReceipt, ContractTransaction, Wallet } from "ethers";
+
 const { orderType } = require("../eip-712-types/order");
 const { parseEther, keccak256 } = ethers.utils;
 
 const provider = ethers.provider;
 let marketplaceContract: Seaport;
 let assetToken: AssetContractShared;
-let testERC1155: BoaTestERC1155;
 let wboaToken: WBOA9;
 
-export const setContracts = (seaportContrct: Seaport, erc1155Contract: BoaTestERC1155) => {
-    marketplaceContract = seaportContrct;
-    testERC1155 = erc1155Contract;
+export const setContracts = (
+    _seaportContrct: Seaport,
+    _assetContrct: AssetContractShared,
+    _wboaContrct?: WBOA9 | undefined
+) => {
+    marketplaceContract = _seaportContrct;
+    assetToken = _assetContrct;
+    if (_wboaContrct !== undefined) {
+        wboaToken = _wboaContrct;
+    }
 };
 
 export const setSeaport = (seaportContrct: Seaport) => {
@@ -52,7 +68,7 @@ export const setChainId = async (_chainId: number) => {
 export const depositToWBoa = async (depositer: string, totalDeposit: BigNumber) => {
     const depositSigner = new NonceManager(new GasPriceManager(provider.getSigner(depositer)));
 
-    let amount = await wboaToken.getBalance(depositer);
+    const amount = await wboaToken.getBalance(depositer);
 
     if (totalDeposit.gt(amount)) {
         await wboaToken.connect(depositSigner).deposit({ value: totalDeposit.sub(amount) });
@@ -281,7 +297,7 @@ const checkTransferEvent = async (
 ) => {
     const { itemType, token, identifier: id1, identifierOrCriteria: id2, amount, recipient } = item;
     const identifier = id1 ?? id2;
-    const sender = offerer; //getTransferSender(offerer, conduitKey);
+    const sender = offerer; // getTransferSender(offerer, conduitKey);
     if ([1, 2, 5].includes(itemType)) {
     } else if ([3, 4].includes(itemType)) {
         const contract = new Contract(token, testERC1155.interface, provider);
