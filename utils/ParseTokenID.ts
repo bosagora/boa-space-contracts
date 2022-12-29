@@ -8,7 +8,10 @@ export function parseTokenId(tokenId: string): [string, BigNumber, number] {
 
     const lastNftId = BigNumber.from(tokenId);
     const SUPPLY_MASK = BigNumber.from(1).shl(SUPPLY_BITS).sub(1);
-    const INDEX_MASK = BigNumber.from(1).shl(INDEX_BITS).sub(1).xor(SUPPLY_MASK);
+    const INDEX_MASK = BigNumber.from(1)
+        .shl(INDEX_BITS + SUPPLY_BITS)
+        .sub(1)
+        .xor(SUPPLY_MASK);
 
     const address = lastNftId.shr(INDEX_BITS + SUPPLY_BITS).toHexString();
     const tokenIndex = lastNftId.and(INDEX_MASK).shr(SUPPLY_BITS);
